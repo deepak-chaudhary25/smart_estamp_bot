@@ -1,0 +1,718 @@
+<html><head>
+
+<!-- Software Testing Case #91885, commented below code -->
+<!-- <script language="JavaScript" type="text/JavaScript">history.forward();</script> -->
+
+<title>India e-Stamping System</title>
+<!--<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">-->
+
+<meta http-equiv="Cache-control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" src="/trade/esi/html/js/popcalendar.js"></script></head><body onload="doShowHide();initDynamicOptionLists();noBack();" onkeypress="return disableCtrlModifer(event);" onkeydown="return disableCtrlModifer(event);" onpageshow="if(event.persisted)noBack();" onunload=""><div onclick="bShow=true" id="pccalendar" style="z-index:+999;position:absolute;visibility:hidden;filter:progid:DXImageTransform.Microsoft.Shadow(color='#aaaaaa',Direction=135,Strength=2)"><table style="width:220px;font:11px Arial;border:1px solid #000000;background:#fff"><tbody><tr bgcolor="#933C06"><td><table width="100%"><tbody><tr><td style="padding:2px;font:bold 11px Arial;color:#fff"><span id="pccaption"><span style="border:1px solid #ffffff;cursor:pointer" onmouseover="swapImage('pcchangeLeft','left2.gif');this.style.borderColor='#DBAC58';window.status='undefined'" onclick="decMonth()" onmouseout="clearInterval(intervalID1);swapImage('pcchangeLeft','left1.gif');this.style.borderColor='#ffffff';window.status=''" onmousedown="clearTimeout(timeoutID1);timeoutID1=setTimeout('StartDecMonth()',500)" onmouseup="clearTimeout(timeoutID1);clearInterval(intervalID1)">&nbsp;<img id="pcchangeLeft" src="/trade/esi/images/gfx/left1.gif" width="10" height="11" border="0">&nbsp;</span>&nbsp;<span id="pcspanMonth" style="border:1px solid #ffffff;cursor:pointer" onmouseover="swapImage('pcchangeMonth','drop2.gif');this.style.borderColor='#DBAC58';window.status='undefined'" onmouseout="swapImage('pcchangeMonth','drop1.gif');this.style.borderColor='#ffffff';window.status=''" onclick="popUpMonth()"></span>&nbsp;<span style="border:1px solid #ffffff;cursor:pointer" onmouseover="swapImage('pcchangeRight','right2.gif');this.style.borderColor='#DBAC58';window.status='undefined'" onmouseout="clearInterval(intervalID1);swapImage('pcchangeRight','right1.gif');this.style.borderColor='#ffffff';window.status=''" onclick="incMonth()" onmousedown="clearTimeout(timeoutID1);timeoutID1=setTimeout('StartIncMonth()',500)" onmouseup="clearTimeout(timeoutID1);clearInterval(intervalID1)">&nbsp;<img id="pcchangeRight" src="/trade/esi/images/gfx/right1.gif" width="10" height="11" border="0">&nbsp;</span>&nbsp;&nbsp;&nbsp;<span id="pcspanYear" style="border:1px solid #ffffff;cursor:pointer" onmouseover="swapImage('pcchangeYear','drop2.gif');this.style.borderColor='#DBAC58';window.status='undefined'" onmouseout="swapImage('pcchangeYear','drop1.gif');this.style.borderColor='#ffffff';window.status=''" onclick="popUpYear()"></span>&nbsp;</span></td><td align="right" valign="middle"><a href="javascript:hideCalendar()"><img src="/trade/esi/images/gfx/close2.gif" width="18" height="17" border="0"></a></td></tr></tbody></table></td></tr><tr><td style="padding:5px;background:#FFF2DB"><span id="pccontent"></span></td></tr></tbody></table></div><div id="pcselectMonth" style="z-index:+999;position:absolute;visibility:hidden;"></div><div id="pcselectYear" style="z-index:+999;position:absolute;visibility:hidden;"></div>
+<script type="text/javascript" src="/trade/esi/html/js/commonvalidation.js"></script>
+<script type="text/javascript" src="/trade/esi/html/js/dynamicoptionlist.js"></script>
+
+ <!-- Issue 214042: VA/PT audit observations -->
+
+<script type="text/javascript" src="/trade/esi/html/js/jquery-3.7.1.min.js"></script> <!-- Issue 442357: VA/PT audit observations -->
+
+<!-- CR11_04072018_Imprest_Reports new JS file added -->
+<script type="text/javascript" src="/trade/esi/html/js/DateApi.js"></script>
+
+
+<!-- Software Testing Case #91885, added noBack() function, to stop browser back button -->
+<script type="text/javascript">
+function noBack(){
+	window.history.forward();
+}
+
+</script>
+
+
+<link href="/trade/esi/css/newstyle.css" rel="stylesheet" type="text/css">
+<link href="/trade/esi/css/govt.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}
+
+.style1 {
+	color: #FFFFFF
+}
+</style>
+
+
+<script type="text/javascript">
+var TheNewWindow = null;
+
+function doShowHide()
+{
+	if(document.accDispForm != null && document.accDispForm.paymMode != null)
+	{
+		var showVals = 'CHEQUE, DD';
+		var val = document.accDispForm.paymMode.value;
+		if(showVals.indexOf(val) >= 0)
+		{
+			HM_f_ToggleElementList(true,['hideDDNo', 'hideDDNoLabel'],'id');
+		}
+		else
+		{
+			HM_f_ToggleElementList(false,['hideDDNo', 'hideDDNoLabel'],'id');
+		}
+	}
+}
+
+var termsWindow_width="500", termsWindow_height="300";
+var termsWindow_left =(screen.width/2) - termsWindow_width/2;
+var termsWindow_top = (screen.height/2) - termsWindow_height/2;
+var styleStr_termsWindow ='toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=yes,width='+termsWindow_width+',height='+termsWindow_height+',left='+termsWindow_left+',top='+termsWindow_top+',screenX='+termsWindow_left+',screenY='+termsWindow_top;
+var termsWindowHandler = null;
+function openPopUpTerms(url)
+{
+   if(termsWindowHandler != null)
+   {
+	   termsWindowHandler.close();
+   }
+   termsWindowHandler = window.open(url,"termsWindow", styleStr_termsWindow);
+   if (!termsWindowHandler.opener)
+   {
+		termsWindowHandler.opener = self;
+   }
+}
+
+</script>
+<script language="JavaScript">
+
+var message="";
+
+function clickIE() {if (document.all) {(message);return false;}}
+function clickNS(e) {if
+(document.layers||(document.getElementById&&!document.all)) {
+if (e.which==2||e.which==3) {(message);return false;}}}
+if (document.layers)
+{document.captureEvents(Event.MOUSEDOWN);document.onmousedown=clickNS;}
+else{document.onmouseup=clickNS;document.oncontextmenu=clickIE;}
+
+document.oncontextmenu=new Function("return false")
+
+
+function disableCtrlModifer(evt)
+{
+var disabled = {n:0};
+var ctrlMod = (window.event)? window.event.ctrlKey : evt.ctrlKey;
+var key = (window.event)? window.event.keyCode : evt.which;
+key = String.fromCharCode(key).toLowerCase();
+return (ctrlMod && (key in disabled))? false : true;
+}
+
+// CR17_07022023_IGRDashboards Starts
+function openAnalystics(){
+	var win=null;
+	win=window.open("/eStampIndia/dashBoard/DashBoardServlet?rDoAction=DashboardIGR", "Analytics", "toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=1,resizable=1,height=400,width=550,addressbar=no");
+	if (win.outerWidth < screen.availWidth || win.outerHeight < screen.availHeight)
+	  {
+		win.moveTo(0,0);
+		win.resizeTo(screen.availWidth, screen.availHeight);
+	  }
+	win.focus();
+}
+// CR17_07022023_IGRDashboards Ends
+
+</script>
+<!-- Support #79972 - START -->
+<script>
+    $(function() {
+
+        $('.link2').click(function(e) {
+            if ($('.link2').hasClass('disabled'))
+            {
+            	alert('E-Stamp printing is in progress.');
+                e.preventDefault();
+                return false;
+            } else {
+                //alert('I am Enabled Now');
+            }
+        });
+
+    });
+</script>
+<!-- Support #79972 - END -->
+
+<!-- Software Testing Case #91885, noBack() added, onpageshow and onunload events also added -->
+
+
+<form name="invalidwindow" id="invalidwindow" action="/eStampIndia/useradmin/UserAdminMainServlet?rDoAction=DisplayMultiTabErrorPage" method="post"></form>
+<script language="JavaScript" type="text/JavaScript">
+<!--CR08_25072016_integrationwithCSC, below code added to explicity set the window name-->
+
+	if(window.name == '' || window.name != 'eStamp'){
+		invokeInvalidBrowserWindow();
+	}
+
+	function invokeInvalidBrowserWindow(){
+		//location.replace("/eStampIndia/esi/ESITabError.jsp")
+		document.invalidwindow.submit();
+	}
+</script>
+
+<!-- Support #93580:SHCIL application audit findings- 2015 - START -->
+
+<script language="Javascript">
+var secs
+var timerID = null
+var timerRunning = false
+var delay = 1000
+//var popupMsg = '';
+
+function InitializeTimer()
+{
+    // Set the length of the timer, in seconds
+    secs ='600'
+    StopTheClock()
+    StartTheTimer()
+}
+
+
+
+function StopTheClock()
+{
+    if(timerRunning)
+        clearTimeout(timerID)
+    timerRunning = false
+}
+
+function getFormatedCurrentDate()
+{
+var m_names = new Array(
+"Jan","Feb","Mar","Apr",
+"May","Jun","Jul","Aug",
+"Sep","Oct","Nov","Dec"
+);
+
+var time = new Date();
+
+time.setMinutes(time.getMinutes()+1);
+
+var inthour = time.getHours();
+var intmin  = time.getMinutes();
+if(inthour <10){
+	inthour = "0"+inthour;
+}
+if(intmin <10){
+	intmin = "0"+intmin;
+}
+
+
+return m_names[time.getMonth()]+' '+time.getDate()+','+time.getFullYear()+' '+inthour+':'+intmin;
+
+}
+
+
+function getCookie(name){
+	  var cname = name + "=";
+	  var dc = document.cookie;
+
+	  if (dc.length > 0) {
+	    begin = dc.indexOf(cname);
+
+	    if (begin != -1) {
+	      begin += cname.length;
+	      end = dc.indexOf(";", begin);
+
+	      if (end == -1) end = dc.length;
+
+		return unescape(dc.substring(begin, end));
+	    }
+	  }
+	  return null;
+}
+
+function getCurrentTime() {
+
+	  var curtime = new Date();
+	  var curhour = curtime.getHours();
+	  var curmin = curtime.getMinutes();
+	  var cursec = curtime.getSeconds();
+
+	  var inseconds = curtime*60+curhour*60+curmin*60+cursec;
+
+
+	  return inseconds;
+}
+
+function StartTheTimer() {
+       if (secs == '60')
+       {
+       		var cookievalue = getCookie('AlertTime');
+       		if(cookievalue != null){
+       			if(getCurrentTime() >= cookievalue)
+       			{
+       				popupMsg = 'This session will expire at '+' '+getFormatedCurrentDate()+' '+' Do you Want To Extend the session ?';
+
+   				}else{
+	   				secs=cookievalue-getCurrentTime();
+	   				secs = secs - 1
+	   				timerRunning = true
+	   				timerID = self.setTimeout("StartTheTimer()", delay)
+	   			}
+
+   		   }
+   		   else{
+   			popupMsg = 'This session will expire at '+' '+getFormatedCurrentDate()+' '+' Do you Want To Extend the session ?';
+
+   		}
+
+   		var isClose = confirm(popupMsg);
+
+   		if(isClose == true)
+   		{
+
+   			buttonClick = "OK";
+   			document.cookie = "AlertTime" + "=" + escape (getCurrentTime()+600);
+    			window.open('/eStampIndia/esi/EsiSessionExtend.jsp','newwindow','scrollbars=yes,top=100,left=200,width=650,height=350');
+
+   			secs='600'
+   			secs = secs - 1
+   			timerRunning = true
+   			timerID = self.setTimeout("StartTheTimer()", delay)
+   		}
+   		else if(isClose == false){
+   			//logout1("../ana/LogoutServlet");//Code added if user choose "Cancel", then logout from the application. 23062015
+   		}
+
+   	}
+    else
+    {
+        secs = secs - 1
+        timerRunning = true
+        timerID = self.setTimeout("StartTheTimer()", delay)
+    }
+
+        // end pop up code
+}
+
+</script>
+
+<script language="Javascript">
+
+	InitializeTimer();
+
+</script>
+<!-- Support #93580:SHCIL application audit findings- 2015 - END -->
+
+
+				&nbsp;
+			<table width="100%" border="0" cellpadding="0" cellspacing="0">
+	<tbody><tr>
+		<td align="center" valign="top">
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			<tbody><tr>
+				<td width="40%" align="right" valign="bottom"><img src="/trade/esi/images/logo.gif" width="318" height="43"></td>
+				<td width="60%" align="center" valign="top">
+				<table width="100%" height="43" border="0" cellpadding="0" cellspacing="0">
+					<tbody><tr>
+						<td width="98%" align="right" valign="middle" background="/trade/esi/images/bg_toplinks.gif" class="lnk-sort-again">
+							<a href="/eStampIndia/useradmin/UserAdminLoginServlet?rDoAction=HomePage" class="link2">Home</a> <span class="style1">|</span>
+                            <a href="/eStampIndia/useradmin/UserAdminMainServlet?rDoAction=ChangePwd" class="link2">My Account</a> <span class="style1">|</span> <a href="/eStampIndia/useradmin/UserAdminMainServlet?rDoAction=Logout" class="link2">Logout</a></td>
+						<td width="2%" align="right" valign="middle" background="/trade/esi/images/bg_toplinks.gif" class="lnk-sort-again">&nbsp;</td>
+					</tr>
+				</tbody></table>
+				</td>
+			</tr>
+		</tbody></table>
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			<tbody><tr>
+				<td align="left" valign="top" background="/trade/esi/images/bg_subpageheader.jpg"><img src="/trade/esi/images/header_subpage2.jpg" width="385" height="95"></td>
+			</tr>
+		</tbody></table>
+		
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			<tbody><tr>
+				<td width="195" align="left" valign="top">
+				<table width="195" border="0" cellspacing="0" cellpadding="0">
+					<tbody><tr align="left" valign="middle">
+						<td height="31" colspan="1" class="lnk-menu">
+						<div align="left"><font size="1" color="#333333"> <b>Welcome,<br>
+						 NAVAL   &nbsp;KISHORE   &nbsp;MISHRA  &nbsp;[upnavmisu001]</b>
+						</font></div>
+						</td>
+						<td>&nbsp;&nbsp;&nbsp;</td>
+					</tr>
+					<!-- CR08_15042020_Indivudual user ID for CRAS - starts here -->
+					
+					<!-- CR08_15042020_Indivudual user ID for CRAS - ends here -->
+					<!-- CR21_26082015 - Display User Last Login Details - START -->
+					<tr>
+					     <td colspan="1" class="lnk-menu" height="31" style="background-color: #d69432">
+							<div align="left"><font color="#ffffff" size="1">
+								<b>Last Login :<br> 11-05-2026 04:31:10 PM</b>
+							</font></div>
+						</td>
+					</tr>
+					<!-- CR21_26082015 - Display User Last Login Details - END -->
+					<tr>
+						<td>
+						<table width="100%" border="0" cellspacing="0" cellpadding="0">
+							<tbody><tr>
+								<td></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/submission/SubmissionServlet?rDoAction=LoadStampDuty" class="link2">Create Submission</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/cert/certgen/CertGenServlet?sDoAction=DraftDetail&amp;aAction=EditSubmission" class="link2">Edit Submission</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/cert/certgen/CertGenServlet?sDoAction=DraftDetail&amp;aAction=GenerateCertificate" class="link2">Generate Certificate</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/cert/certsearch/CertSearchServlet?rDoAction=LoadSearchAddnlCert" class="link2">Additional Stamp Duty</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/useradmin/UserAdminMainServlet?rDoAction=GetImpBal" class="link2">ACC Own Imprest Balance</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/cert/certsearch/CertSearchServlet?rDoAction=LoadSearchCert" class="link2">Search Certificate</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/cert/certutil/CertUtilVerifyServlet?rDoAction=VerifyCert" class="link2">Verify Certificate</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/submission/SubmissionServlet?rDoAction=SEARCHBYUNIDOCID" class="link2">Search Submission</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/report/ReportServlet?pReportAction=pShowMgtRptMainPage" class="link2">Reports</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/useradmin/UserAdminMainServlet?rDoAction=GetEcollDetails" class="link2">Credits Received</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/submission/SubmissionServlet?rDoAction=LoadSearchSubmForPAN" class="link2">Update Missing PAN/Form 60</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr>
+							
+						</tbody></table>
+						</td>
+						<td>&nbsp;&nbsp;&nbsp;</td>
+					</tr>
+				</tbody></table>
+				</td>
+				<td width="100%" align="left" valign="top">
+
+
+
+	
+
+
+
+<!-- CR21_26082015 - Phase 2 - START -->
+<script type="text/javascript">
+
+	$(document).ready(function() {
+		
+		/* CR09_15042020_CSCFlowChanges starts here */
+		$( "[name = 'pDelete']").click(function(){
+			$("[name= 'pDelete']").prop('disabled','true');
+			
+			$("#frmStampDuty").attr("action","/eStampIndia/submission/SubmissionServlet?rDoAction=DeleteCSCSubmission");
+			$("#frmStampDuty").submit();
+		});
+		/* CR09_15042020_CSCFlowChanges ends here */
+		
+		$( "[name = 'btnDelete']").click(function(){
+				
+			var isConfirm = confirm('Are you sure want to delete all the rectified submission(s) [that is base as well as additional].');
+			if(!isConfirm) {
+				return;
+			}
+			
+			$("#rDoAction").val("DeleteBaseAddRectSubm");
+			$("#frmStampDuty").attr("action","/eStampIndia/submission/SubmissionServlet");
+			$("#frmStampDuty").submit();
+
+	    });
+		
+		<!--CR08_25072016_integrationwithCSC, start -->
+		$("[name= 'payFromCscWallet']").click(function(){
+			var isConfirm = confirm('Double check the stamp duty amount. Once payment is completed, system will not allow to edit the stamp duty amount.');
+			if(!isConfirm){
+				return;
+			}
+			$("[name= 'payFromCscWallet']").prop('disabled','true');<!--CR08_25072016_integrationwithCSC, code review finding: button disabled-->
+			/* CR06_05042017, below url modified */
+			/* CR09_15042020_CSCFlowChanges starts here */
+			
+		$.post('/eStampIndia/submission/CSCRequestServlet', 
+   		  {},
+       	function(responseText) {   // Execute Ajax POST request on URL of "NotificationServlet" and execute the following function with Ajax response text...
+			try{
+				console.log('responseText------->'+responseText);
+				var list = responseText.split("|");
+				var msg = list[1].concat('|',list[2]);
+				console.log('CscPaymentGwayUrl----#############3333#######--->'+"https://wallet.csccloud.in/v1/payment/");
+				document.getElementById("message").value=msg;
+				$("#frmStampDuty").attr('action','https://wallet.csccloud.in/v1/payment/' + list[0]);			
+				$("#frmStampDuty").submit();
+           	}catch(e){
+          		alert("There seems to be have some issue. Please contact SHCIL.");
+          	}
+       		}
+		);
+		/* CR09_15042020_CSCFlowChanges ends here */
+		});			
+		
+		$("[name= 'pPayFromWalletAgain']").click(function(){
+			$("[name= 'pPayFromWalletAgain']").prop('disabled','true');<!--CR08_25072016_integrationwithCSC, code review finding: button disabled-->
+			/* CR06_05042017, below url modified */
+			/* CR09_15042020_CSCFlowChanges starts here */
+			
+			
+			$.post('/eStampIndia/submission/CSCRequestServlet', 
+			   		  {payAgain : 'true'},
+			       	function(responseText) {   // Execute Ajax POST request on URL of "NotificationServlet" and execute the following function with Ajax response text...
+						try{
+							var list = responseText.split("|");
+							var msg = list[1].concat('|',list[2]);
+							document.getElementById("message").value=msg;
+							$("#frmStampDuty").attr('action','https://wallet.csccloud.in/v1/payment/' + list[0]);			
+							$("#frmStampDuty").submit();
+			           	}catch(e){
+			          		alert("There seems to be have some issue. Please contact SHCIL.");
+			          	}
+			       		}
+					);
+					/* CR09_15042020_CSCFlowChanges ends here */
+		});
+		<!--CR08_25072016_integrationwithCSC, end-->
+		<!-- SREI -->
+		$("[name= 'payFromSreiWallet']").click(function(){
+			var isConfirm = confirm('Double check the stamp duty amount. Once payment is completed, system will not allow to edit the stamp duty amount.');
+			if(!isConfirm){
+				return;
+			}
+			$("[name= 'payFromSreiWallet']").prop('disabled','true');
+			$("#frmStampDuty").attr('action','https://retail.sahaj.co.in/web/guest/estamping-thirdparty-skash');	
+			$("#frmStampDuty").submit();
+		});	
+		$("[name= 'pPayFromSreiWalletAgain']").click(function(){
+			$("[name= 'pPayFromSreiWalletAgain']").prop('disabled','true');
+			$("#frmStampDuty").attr('action','https://retail.sahaj.co.in/web/guest/estamping-thirdparty-skash');			
+			$("#frmStampDuty").submit();
+		});
+		<!-- SREI -->
+	});
+	
+
+</script>
+
+<!-- CR21_26082015 - Phase 2 - END -->
+
+<form name="frmStampDuty" id="frmStampDuty" method="post" action="SubmissionServlet">
+
+<!--CR08_25072016_integrationwithCSC, start-->
+<!-- SREI -->
+
+
+<!-- SREI -->
+<!--CR08_25072016_integrationwithCSC, end-->
+
+<input type="hidden" name="actualAction" value="GenerateCertificate"><!-- CR29_Added new hidden field -->
+	<table width="800" border="0" cellpadding="1" cellspacing="2" height="1" align="left">
+		<tbody><tr align="left">
+			<td align="left">
+				<table border="0" cellspacing="3" cellpadding="3">
+					<tbody><tr><td class="title" align="left">E-Stamping - Create Submission </td></tr>
+				</tbody></table>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2"><br>
+			<table border="0" cellspacing="5" cellpadding="2">
+				<tbody><tr><td>
+					<table border="0" cellpadding="0" cellspacing="0">
+						<tbody><tr dir="ltr">
+
+							<td width="10" style="background-color: #CC7A00"><img src="/trade/esi/images/pfk_spacer.gif" width="10" height="20">
+							</td>
+							<!-- CR08_25072016_integrationwithCSC, start -->
+							
+							<!-- CR08_25072016_integrationwithCSC, end -->
+								<td dir="ltr" class="ttl-category" height="19" width="792">
+&nbsp;
+									<span class="ttl-predefined"> Submission Saved</span>
+								</td>
+
+							
+						</tr>
+
+					</tbody></table>
+				</td></tr>
+			</tbody></table>
+			<br>
+			<table width="100%" border="0" cellpadding="7">
+			
+			<!-- CR08_25072016_integrationwithCSC, start -->
+			
+			<!-- CR08_25072016_integrationwithCSC, end -->
+				<tbody><tr>
+					<td class="txt-body">					
+					The submission has been saved successfully with the following Unique Doc. Reference ID:</td>
+				</tr>
+				<tr>
+					<td class="txt-body"><b>SUBIN-UPUP1605110406601075810792Y</b></td>
+				</tr>
+				<tr>
+					<td class="txt-body">Please use this number for future references. </td>
+				</tr>
+			
+			<!-- CR21_26082015 - Phase 2 - START -->
+			
+			<!-- CR21_26082015 - Phase 2 - END -->
+			
+			<!-- CR08_06042015_DIRECTDEPOSITOFCASH, below block added to display direct cash deposit details, starts -->
+			
+			<!-- CR08_06042015_DIRECTDEPOSITOFCASH, ends -->
+			
+			<!-- CR21_26082015_PHII, below block added to display account transfer details, starts -->
+			
+			<!-- CR21_26082015_PHII, end -->
+			<!-- CR13_20072018_POS-Auto changes starts here -->
+			
+			<!-- CR13_20072018_POS-Auto changes ends here -->
+			
+		
+		
+	</tbody></table>
+	<br>
+	<hr>
+		<table border="0" cellspacing="3" cellpadding="3">
+			<tbody><tr dir="ltr">
+
+				<td dir="ltr" align="left" class="title">
+
+					<input type="button" name="pNext" value=" &nbsp;&nbsp;&nbsp;Print This Page&nbsp;&nbsp;&nbsp; " class="button" onmouseover="(this.className='buttonover')" onmouseout="(this.className='button')" onclick="frmSubmit(1)">
+
+				</td>
+
+				
+				
+					
+					
+					<!-- CR45_Odisha_Offline changes ends here-->
+					
+								<td dir="ltr" align="left" class="title">
+
+								<input type="button" name="pNext" value=" &nbsp;&nbsp;&nbsp;Proceed to Generate Certificate&nbsp;&nbsp;&nbsp; " class="button" onmouseover="(this.className='buttonover')" onmouseout="(this.className='button')" onclick="redirectGenCertForIMPACC();">
+
+								</td>
+
+							
+					
+					
+					
+					
+					
+				
+					
+					
+					
+
+
+
+							<!-- CR08_25072016_integrationwithCSC, added below code to show Generate Certificate button for rectified submission, start -->
+					<!-- CR08_25072016_integrationwithCSC, added below code to show Generate Certificate button for rectified submission, start -->
+					
+					<!-- CR08_25072016_integrationwithCSC, end -->
+				
+				<!-- CR08_25072016_integrationwithCSC, start -->
+				
+					<td dir="ltr" align="left" class="title">
+
+						<input type="button" name="pNext" value=" &nbsp;&nbsp;&nbsp;Done&nbsp;&nbsp;&nbsp; " class="button" onmouseover="(this.className='buttonover')" onmouseout="(this.className='button')" onclick="frmSubmit(2)">
+
+					</td>
+
+				
+								
+								
+				<!--  --><!-- CR08_25072016_integrationwithCSC, commented this code and added the check to above if block-->
+					<td dir="ltr" align="left" class="title">
+
+						<input type="button" name="pNext" value=" &nbsp;&nbsp;&nbsp;Preview Submission&nbsp;&nbsp;&nbsp; " class="button" onmouseover="(this.className='buttonover')" onmouseout="(this.className='button')" onclick="frmSubmit(3)">
+
+					</td>
+
+				<!--  -->
+				<!-- CR08_25072016_integrationwithCSC, end -->
+				<!-- CR45_Odisha Offline changes starts here -->
+				  
+					<!-- CR45_Odisha Offline changes ends here -->
+			</tr>
+
+		</tbody></table>
+		<br>
+		</td>
+	</tr>
+</tbody></table>
+
+</form>
+<script language="JavaScript" type="text/JavaScript">
+var previewCertWindow_width="800", previewCertWindow_height="630";
+var previewCertWindow_left =(screen.width/2) - previewCertWindow_width/2;
+var previewCertWindow_top = (screen.height/2) - previewCertWindow_height/2;
+var styleStr_previewCertWindow ='toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=yes,width='+previewCertWindow_width+',height='+previewCertWindow_height+',left='+previewCertWindow_left+',top='+previewCertWindow_top+',screenX='+previewCertWindow_left+',screenY='+previewCertWindow_top;
+var previewCertWindowHandler = null;
+function redirectGenCert()
+{
+	/* Modified  for CR45_Offline_Changes */
+
+    document.location.href = "/eStampIndia/submission/SubmissionServlet?rDoAction=EditStampDutyInfo&rDocId=SUBIN-UPUP1605110406601075810792Y";
+}
+
+function redirectGenCertForIMPACC()
+{
+	var actualAction = 'GenerateCertificate';
+	document.location.href = "/eStampIndia/submission/SubmissionServlet?rDoAction=EditStampDutyInfo&actualAction="+actualAction+"&rDocId=SUBIN-UPUP1605110406601075810792Y";
+}
+function frmSubmit(x)
+{
+	if (x==1)
+	{
+		window.print();
+		return;
+	}
+	if (x==2)
+	{
+		//document.location.href = "/eStampIndia/submission/SubmissionServlet?rDoAction=LoadStampDuty";
+		document.frmStampDuty.action = "/eStampIndia/submission/SubmissionServlet?rDoAction=LoadStampDuty";
+		document.frmStampDuty.submit();
+	}
+	if(x==3)  //SubmissionCertPreview
+	{
+	if(previewCertWindowHandler != null)
+     {
+	   previewCertWindowHandler.close();
+     }
+     previewCertWindowHandler = window.open("SubmissionServlet?rDoAction=SubmissionCertPreview","previewCertWindow", styleStr_previewCertWindow);     
+    if (!previewCertWindowHandler.opener)
+    {
+		previewCertWindowHandler.opener = self;
+    }
+										
+	}
+	if(x==4)  //SubmissionEregPreview
+	{
+	if(previewCertWindowHandler != null)
+     {
+	   previewCertWindowHandler.close();
+     }
+     previewCertWindowHandler = window.open("SubmissionServlet?rDoAction=SubmissionEregPreview","previewCertWindow", styleStr_previewCertWindow);     
+    if (!previewCertWindowHandler.opener)
+    {
+		previewCertWindowHandler.opener = self;
+    }
+										
+	}
+	
+}
+
+</script>
+		
+
+								
+            				</td>
+            			</tr>
+            			<tr>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td height="20" align="center" valign="top" background="/trade/esi/images/bg_footerdos.jpg">&nbsp;</td>
+						</tr>
+					</tbody></table>
+				</td>
+			</tr>
+			<tr></tr>
+		</tbody></table>
+	
+</body></html>
