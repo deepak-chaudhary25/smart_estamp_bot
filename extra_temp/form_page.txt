@@ -1,0 +1,4414 @@
+<html><head>
+
+<!-- Software Testing Case #91885, commented below code -->
+<!-- <script language="JavaScript" type="text/JavaScript">history.forward();</script> -->
+
+<title>India e-Stamping System</title>
+<!--<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">-->
+
+<meta http-equiv="Cache-control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" src="/trade/esi/html/js/popcalendar.js"></script></head><body onload="doShowHide();initDynamicOptionLists();noBack();" onkeypress="return disableCtrlModifer(event);" onkeydown="return disableCtrlModifer(event);" onpageshow="if(event.persisted)noBack();" onunload=""><div onclick="bShow=true" id="pccalendar" style="z-index:+999;position:absolute;visibility:hidden;filter:progid:DXImageTransform.Microsoft.Shadow(color='#aaaaaa',Direction=135,Strength=2)"><table style="width:220px;font:11px Arial;border:1px solid #000000;background:#fff"><tbody><tr bgcolor="#933C06"><td><table width="100%"><tbody><tr><td style="padding:2px;font:bold 11px Arial;color:#fff"><span id="pccaption"><span style="border:1px solid #ffffff;cursor:pointer" onmouseover="swapImage('pcchangeLeft','left2.gif');this.style.borderColor='#DBAC58';window.status='undefined'" onclick="decMonth()" onmouseout="clearInterval(intervalID1);swapImage('pcchangeLeft','left1.gif');this.style.borderColor='#ffffff';window.status=''" onmousedown="clearTimeout(timeoutID1);timeoutID1=setTimeout('StartDecMonth()',500)" onmouseup="clearTimeout(timeoutID1);clearInterval(intervalID1)">&nbsp;<img id="pcchangeLeft" src="/trade/esi/images/gfx/left1.gif" width="10" height="11" border="0">&nbsp;</span>&nbsp;<span id="pcspanMonth" style="border:1px solid #ffffff;cursor:pointer" onmouseover="swapImage('pcchangeMonth','drop2.gif');this.style.borderColor='#DBAC58';window.status='undefined'" onmouseout="swapImage('pcchangeMonth','drop1.gif');this.style.borderColor='#ffffff';window.status=''" onclick="popUpMonth()"></span>&nbsp;<span style="border:1px solid #ffffff;cursor:pointer" onmouseover="swapImage('pcchangeRight','right2.gif');this.style.borderColor='#DBAC58';window.status='undefined'" onmouseout="clearInterval(intervalID1);swapImage('pcchangeRight','right1.gif');this.style.borderColor='#ffffff';window.status=''" onclick="incMonth()" onmousedown="clearTimeout(timeoutID1);timeoutID1=setTimeout('StartIncMonth()',500)" onmouseup="clearTimeout(timeoutID1);clearInterval(intervalID1)">&nbsp;<img id="pcchangeRight" src="/trade/esi/images/gfx/right1.gif" width="10" height="11" border="0">&nbsp;</span>&nbsp;&nbsp;&nbsp;<span id="pcspanYear" style="border:1px solid #ffffff;cursor:pointer" onmouseover="swapImage('pcchangeYear','drop2.gif');this.style.borderColor='#DBAC58';window.status='undefined'" onmouseout="swapImage('pcchangeYear','drop1.gif');this.style.borderColor='#ffffff';window.status=''" onclick="popUpYear()"></span>&nbsp;</span></td><td align="right" valign="middle"><a href="javascript:hideCalendar()"><img src="/trade/esi/images/gfx/close2.gif" width="18" height="17" border="0"></a></td></tr></tbody></table></td></tr><tr><td style="padding:5px;background:#FFF2DB"><span id="pccontent"></span></td></tr></tbody></table></div><div id="pcselectMonth" style="z-index:+999;position:absolute;visibility:hidden;"></div><div id="pcselectYear" style="z-index:+999;position:absolute;visibility:hidden;"></div>
+<script type="text/javascript" src="/trade/esi/html/js/commonvalidation.js"></script>
+<script type="text/javascript" src="/trade/esi/html/js/dynamicoptionlist.js"></script>
+
+ <!-- Issue 214042: VA/PT audit observations -->
+
+<script type="text/javascript" src="/trade/esi/html/js/jquery-3.7.1.min.js"></script> <!-- Issue 442357: VA/PT audit observations -->
+
+<!-- CR11_04072018_Imprest_Reports new JS file added -->
+<script type="text/javascript" src="/trade/esi/html/js/DateApi.js"></script>
+
+
+<!-- Software Testing Case #91885, added noBack() function, to stop browser back button -->
+<script type="text/javascript">
+function noBack(){
+	window.history.forward();
+}
+
+</script>
+
+
+<link href="/trade/esi/css/newstyle.css" rel="stylesheet" type="text/css">
+<link href="/trade/esi/css/govt.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}
+
+.style1 {
+	color: #FFFFFF
+}
+</style>
+
+
+<script type="text/javascript">
+var TheNewWindow = null;
+
+function doShowHide()
+{
+	if(document.accDispForm != null && document.accDispForm.paymMode != null)
+	{
+		var showVals = 'CHEQUE, DD';
+		var val = document.accDispForm.paymMode.value;
+		if(showVals.indexOf(val) >= 0)
+		{
+			HM_f_ToggleElementList(true,['hideDDNo', 'hideDDNoLabel'],'id');
+		}
+		else
+		{
+			HM_f_ToggleElementList(false,['hideDDNo', 'hideDDNoLabel'],'id');
+		}
+	}
+}
+
+var termsWindow_width="500", termsWindow_height="300";
+var termsWindow_left =(screen.width/2) - termsWindow_width/2;
+var termsWindow_top = (screen.height/2) - termsWindow_height/2;
+var styleStr_termsWindow ='toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=yes,width='+termsWindow_width+',height='+termsWindow_height+',left='+termsWindow_left+',top='+termsWindow_top+',screenX='+termsWindow_left+',screenY='+termsWindow_top;
+var termsWindowHandler = null;
+function openPopUpTerms(url)
+{
+   if(termsWindowHandler != null)
+   {
+	   termsWindowHandler.close();
+   }
+   termsWindowHandler = window.open(url,"termsWindow", styleStr_termsWindow);
+   if (!termsWindowHandler.opener)
+   {
+		termsWindowHandler.opener = self;
+   }
+}
+
+</script>
+<script language="JavaScript">
+
+var message="";
+
+function clickIE() {if (document.all) {(message);return false;}}
+function clickNS(e) {if
+(document.layers||(document.getElementById&&!document.all)) {
+if (e.which==2||e.which==3) {(message);return false;}}}
+if (document.layers)
+{document.captureEvents(Event.MOUSEDOWN);document.onmousedown=clickNS;}
+else{document.onmouseup=clickNS;document.oncontextmenu=clickIE;}
+
+document.oncontextmenu=new Function("return false")
+
+
+function disableCtrlModifer(evt)
+{
+var disabled = {n:0};
+var ctrlMod = (window.event)? window.event.ctrlKey : evt.ctrlKey;
+var key = (window.event)? window.event.keyCode : evt.which;
+key = String.fromCharCode(key).toLowerCase();
+return (ctrlMod && (key in disabled))? false : true;
+}
+
+// CR17_07022023_IGRDashboards Starts
+function openAnalystics(){
+	var win=null;
+	win=window.open("/eStampIndia/dashBoard/DashBoardServlet?rDoAction=DashboardIGR", "Analytics", "toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=1,resizable=1,height=400,width=550,addressbar=no");
+	if (win.outerWidth < screen.availWidth || win.outerHeight < screen.availHeight)
+	  {
+		win.moveTo(0,0);
+		win.resizeTo(screen.availWidth, screen.availHeight);
+	  }
+	win.focus();
+}
+// CR17_07022023_IGRDashboards Ends
+
+</script>
+<!-- Support #79972 - START -->
+<script>
+    $(function() {
+
+        $('.link2').click(function(e) {
+            if ($('.link2').hasClass('disabled'))
+            {
+            	alert('E-Stamp printing is in progress.');
+                e.preventDefault();
+                return false;
+            } else {
+                //alert('I am Enabled Now');
+            }
+        });
+
+    });
+</script>
+<!-- Support #79972 - END -->
+
+<!-- Software Testing Case #91885, noBack() added, onpageshow and onunload events also added -->
+
+
+<form name="invalidwindow" id="invalidwindow" action="/eStampIndia/useradmin/UserAdminMainServlet?rDoAction=DisplayMultiTabErrorPage" method="post"></form>
+<script language="JavaScript" type="text/JavaScript">
+<!--CR08_25072016_integrationwithCSC, below code added to explicity set the window name-->
+
+	if(window.name == '' || window.name != 'eStamp'){
+		invokeInvalidBrowserWindow();
+	}
+
+	function invokeInvalidBrowserWindow(){
+		//location.replace("/eStampIndia/esi/ESITabError.jsp")
+		document.invalidwindow.submit();
+	}
+</script>
+
+<!-- Support #93580:SHCIL application audit findings- 2015 - START -->
+
+<script language="Javascript">
+var secs
+var timerID = null
+var timerRunning = false
+var delay = 1000
+//var popupMsg = '';
+
+function InitializeTimer()
+{
+    // Set the length of the timer, in seconds
+    secs ='600'
+    StopTheClock()
+    StartTheTimer()
+}
+
+
+
+function StopTheClock()
+{
+    if(timerRunning)
+        clearTimeout(timerID)
+    timerRunning = false
+}
+
+function getFormatedCurrentDate()
+{
+var m_names = new Array(
+"Jan","Feb","Mar","Apr",
+"May","Jun","Jul","Aug",
+"Sep","Oct","Nov","Dec"
+);
+
+var time = new Date();
+
+time.setMinutes(time.getMinutes()+1);
+
+var inthour = time.getHours();
+var intmin  = time.getMinutes();
+if(inthour <10){
+	inthour = "0"+inthour;
+}
+if(intmin <10){
+	intmin = "0"+intmin;
+}
+
+
+return m_names[time.getMonth()]+' '+time.getDate()+','+time.getFullYear()+' '+inthour+':'+intmin;
+
+}
+
+
+function getCookie(name){
+	  var cname = name + "=";
+	  var dc = document.cookie;
+
+	  if (dc.length > 0) {
+	    begin = dc.indexOf(cname);
+
+	    if (begin != -1) {
+	      begin += cname.length;
+	      end = dc.indexOf(";", begin);
+
+	      if (end == -1) end = dc.length;
+
+		return unescape(dc.substring(begin, end));
+	    }
+	  }
+	  return null;
+}
+
+function getCurrentTime() {
+
+	  var curtime = new Date();
+	  var curhour = curtime.getHours();
+	  var curmin = curtime.getMinutes();
+	  var cursec = curtime.getSeconds();
+
+	  var inseconds = curtime*60+curhour*60+curmin*60+cursec;
+
+
+	  return inseconds;
+}
+
+function StartTheTimer() {
+       if (secs == '60')
+       {
+       		var cookievalue = getCookie('AlertTime');
+       		if(cookievalue != null){
+       			if(getCurrentTime() >= cookievalue)
+       			{
+       				popupMsg = 'This session will expire at '+' '+getFormatedCurrentDate()+' '+' Do you Want To Extend the session ?';
+
+   				}else{
+	   				secs=cookievalue-getCurrentTime();
+	   				secs = secs - 1
+	   				timerRunning = true
+	   				timerID = self.setTimeout("StartTheTimer()", delay)
+	   			}
+
+   		   }
+   		   else{
+   			popupMsg = 'This session will expire at '+' '+getFormatedCurrentDate()+' '+' Do you Want To Extend the session ?';
+
+   		}
+
+   		var isClose = confirm(popupMsg);
+
+   		if(isClose == true)
+   		{
+
+   			buttonClick = "OK";
+   			document.cookie = "AlertTime" + "=" + escape (getCurrentTime()+600);
+    			window.open('/eStampIndia/esi/EsiSessionExtend.jsp','newwindow','scrollbars=yes,top=100,left=200,width=650,height=350');
+
+   			secs='600'
+   			secs = secs - 1
+   			timerRunning = true
+   			timerID = self.setTimeout("StartTheTimer()", delay)
+   		}
+   		else if(isClose == false){
+   			//logout1("../ana/LogoutServlet");//Code added if user choose "Cancel", then logout from the application. 23062015
+   		}
+
+   	}
+    else
+    {
+        secs = secs - 1
+        timerRunning = true
+        timerID = self.setTimeout("StartTheTimer()", delay)
+    }
+
+        // end pop up code
+}
+
+</script>
+
+<script language="Javascript">
+
+	InitializeTimer();
+
+</script>
+<!-- Support #93580:SHCIL application audit findings- 2015 - END -->
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+	<tbody><tr>
+		<td align="center" valign="top">
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			<tbody><tr>
+				<td width="40%" align="right" valign="bottom"><img src="/trade/esi/images/logo.gif" width="318" height="43"></td>
+				<td width="60%" align="center" valign="top">
+				<table width="100%" height="43" border="0" cellpadding="0" cellspacing="0">
+					<tbody><tr>
+						<td width="98%" align="right" valign="middle" background="/trade/esi/images/bg_toplinks.gif" class="lnk-sort-again">
+							<a href="/eStampIndia/useradmin/UserAdminLoginServlet?rDoAction=HomePage" class="link2">Home</a> <span class="style1">|</span>
+                            <a href="/eStampIndia/useradmin/UserAdminMainServlet?rDoAction=ChangePwd" class="link2">My Account</a> <span class="style1">|</span> <a href="/eStampIndia/useradmin/UserAdminMainServlet?rDoAction=Logout" class="link2">Logout</a></td>
+						<td width="2%" align="right" valign="middle" background="/trade/esi/images/bg_toplinks.gif" class="lnk-sort-again">&nbsp;</td>
+					</tr>
+				</tbody></table>
+				</td>
+			</tr>
+		</tbody></table>
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			<tbody><tr>
+				<td align="left" valign="top" background="/trade/esi/images/bg_subpageheader.jpg"><img src="/trade/esi/images/header_subpage2.jpg" width="385" height="95"></td>
+			</tr>
+		</tbody></table>
+		
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			<tbody><tr>
+				<td width="195" align="left" valign="top">
+				<table width="195" border="0" cellspacing="0" cellpadding="0">
+					<tbody><tr align="left" valign="middle">
+						<td height="31" colspan="1" class="lnk-menu">
+						<div align="left"><font size="1" color="#333333"> <b>Welcome,<br>
+						 NAVAL   &nbsp;KISHORE   &nbsp;MISHRA  &nbsp;[upnavmisu001]</b>
+						</font></div>
+						</td>
+						<td>&nbsp;&nbsp;&nbsp;</td>
+					</tr>
+					<!-- CR08_15042020_Indivudual user ID for CRAS - starts here -->
+					
+					<!-- CR08_15042020_Indivudual user ID for CRAS - ends here -->
+					<!-- CR21_26082015 - Display User Last Login Details - START -->
+					<tr>
+					     <td colspan="1" class="lnk-menu" height="31" style="background-color: #d69432">
+							<div align="left"><font color="#ffffff" size="1">
+								<b>Last Login :<br> 11-05-2026 04:31:10 PM</b>
+							</font></div>
+						</td>
+					</tr>
+					<!-- CR21_26082015 - Display User Last Login Details - END -->
+					<tr>
+						<td>
+						<table width="100%" border="0" cellspacing="0" cellpadding="0">
+							<tbody><tr>
+								<td></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/submission/SubmissionServlet?rDoAction=LoadStampDuty" class="link2">Create Submission</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/cert/certgen/CertGenServlet?sDoAction=DraftDetail&amp;aAction=EditSubmission" class="link2">Edit Submission</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/cert/certgen/CertGenServlet?sDoAction=DraftDetail&amp;aAction=GenerateCertificate" class="link2">Generate Certificate</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/cert/certsearch/CertSearchServlet?rDoAction=LoadSearchAddnlCert" class="link2">Additional Stamp Duty</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/useradmin/UserAdminMainServlet?rDoAction=GetImpBal" class="link2">ACC Own Imprest Balance</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/cert/certsearch/CertSearchServlet?rDoAction=LoadSearchCert" class="link2">Search Certificate</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/cert/certutil/CertUtilVerifyServlet?rDoAction=VerifyCert" class="link2">Verify Certificate</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/submission/SubmissionServlet?rDoAction=SEARCHBYUNIDOCID" class="link2">Search Submission</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/report/ReportServlet?pReportAction=pShowMgtRptMainPage" class="link2">Reports</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/useradmin/UserAdminMainServlet?rDoAction=GetEcollDetails" class="link2">Credits Received</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/submission/SubmissionServlet?rDoAction=LoadSearchSubmForPAN" class="link2">Update Missing PAN/Form 60</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr>
+							
+						</tbody></table>
+						</td>
+						<td>&nbsp;&nbsp;&nbsp;</td>
+					</tr>
+				</tbody></table>
+				</td>
+				<td width="100%" align="left" valign="top">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--CR08_25072016_integrationwithCSC, start-->
+<script language="JavaScript" src="/trade/esi/html/js/ReportsValidate.js"></script>
+<script type="text/javascript">
+// Store original native methods - //Added for Bug 435754: tampering or automation detection with Auto-fill & Method Tampering Detection
+const originalConfirm = Function.prototype.toString.call(window.confirm);
+const originalAlert = Function.prototype.toString.call(window.alert);
+const originalPrompt = Function.prototype.toString.call(window.prompt);
+
+function detectOverrides() {
+	let suspicious = false;
+	if (Function.prototype.toString.call(window.confirm) !== originalConfirm) {
+		console.warn("Confirm has been overridden.");
+		suspicious = true;
+	}
+	if (Function.prototype.toString.call(window.alert) !== originalAlert) {
+		console.warn("Alert has been overridden.");
+		suspicious = true;
+	}
+	if (Function.prototype.toString.call(window.prompt) !== originalPrompt) {
+		console.warn("Prompt has been overridden.");
+		suspicious = true;
+	}
+
+	if (suspicious) {
+		document.getElementById("autoSubmitDetected").value = "true";
+		document.getElementById("seleniumBotFlag").value = "false";
+		document.getElementById("autoFillDirectScanDetected").value = "false";
+		document.getElementById("autoFillShortTimeWindowDetected").value = "false";
+	} else if (isSeleniumBot()) {
+		document.getElementById("autoSubmitDetected").value = "false";
+		document.getElementById("seleniumBotFlag").value = "true";
+		document.getElementById("autoFillDirectScanDetected").value = "false";
+		document.getElementById("autoFillShortTimeWindowDetected").value = "false";
+	}
+}
+//Detect WebDriver
+function isSeleniumBot() {
+    return navigator.webdriver ||
+           window._Selenium_IDE_Recorder || 
+           window.callSelenium ||
+           document.documentElement.getAttribute('webdriver') !== null;
+}
+//EOA for Bug 435754: tampering or automation detection with Auto-fill & Method Tampering Detection
+//Added for Bug 467150: Implement Detection & Restriction for Submission via Autofill
+function setHidden(id, val) {
+  var el = document.getElementById(id);
+  if (el) el.value = val;
+}
+
+function getCandidateInputs() {
+  return document.querySelectorAll(
+    "input:not([type='hidden']), textarea, select"
+  );
+}
+
+/* ===========================
+   GLOBAL STATE
+=========================== */
+var totalTypedChars = 0;
+var firstTypeTime = 0;
+var lastValues = new WeakMap();
+var autofillLocked = false;
+var typingTokenIssued = false;
+
+/* ===========================
+   STRICT HUMAN INPUT TRACKING
+   (Input + Textarea + Select)
+=========================== */
+function recordTyping(e) {
+  if (!e.isTrusted) return;
+
+  if (autofillLocked) return;
+
+  var el = e.target;
+  if (!el) return;
+  
+  issueTypingToken();
+
+  if (el.tagName === "SELECT") {
+    totalTypedChars += 1;
+
+    if (!firstTypeTime) {
+      firstTypeTime = Date.now();
+      setHidden("firstTypeTs", firstTypeTime);
+    }
+
+    setHidden("typedCharCount", totalTypedChars);
+    return;
+  }
+
+  if (!el.value) return;
+
+  var prev = lastValues.get(el) || "";
+  var delta = Math.abs(el.value.length - prev.length);
+
+  if (delta > 0) {
+    totalTypedChars += delta;
+
+    if (!firstTypeTime) {
+      firstTypeTime = Date.now();
+      setHidden("firstTypeTs", firstTypeTime);
+    }
+
+    setHidden("typedCharCount", totalTypedChars);
+    lastValues.set(el, el.value);
+  }
+}
+
+document.addEventListener("input", recordTyping, true);
+
+document.addEventListener("change", recordTyping, true);
+
+/* ===========================
+   AUTOFILL DETECTION (HARD)
+=========================== */
+function detectAutoFillDirectScan() {
+  var typed = parseInt(
+    document.getElementById("typedCharCount").value || "0",
+    10
+  );
+
+  var inputs = getCandidateInputs();
+
+  for (var i = 0; i < inputs.length; i++) {
+    if (inputs[i].value && typed === 0) {
+      autofillLocked = true;
+      setHidden("autoFillDetected", "true");
+      return true;
+    }
+  }
+  return false;
+}
+
+function issueTypingToken() {
+  if (typingTokenIssued || autofillLocked) return;
+
+  var token = Math.random().toString(36).slice(2) +
+              Date.now().toString(36);
+
+  setHidden("typingToken", token);
+  setHidden("typingTokenTs", Date.now());
+
+  typingTokenIssued = true;
+}
+//EOA for Bug 467150: Implement Detection & Restriction for Submission via Autofill
+	$(document).ready(function() {
+	
+			
+		//eoa for CR29_24122019_Handling_Charges
+		/* EOA for 389068_CSC_transaction_MissMatch */
+		
+		
+	 //added for , CR29_24122019_Handling_Charges - end	
+		// put it inside if condition
+		 if($('#handlingCharge').length)
+		 {
+			 
+				// CR29_24122019_Handling_Charges- start
+				var uniqueDocRefNo= $("[name='HIDDENTEXTFIELD5']").val(); 
+			    //var totalAmoutHandlingcharge= $("#totalAmount").val();
+			    
+			    // for edit submisison
+				if(uniqueDocRefNo !=null && uniqueDocRefNo!="")
+				{
+					var handlingcharge= $("#handlingCharge").val();
+				      if(handlingcharge==0)
+				    	  {
+				    	    $("#handlingChargeMode").show();
+				    	    if($("#handlingChargeMode").length)
+				    	    {
+			      		 	    $('input:radio[name=handlingChargeRadio]')[0].checked = false;
+			 	    		    $('input:radio[name=handlingChargeRadio]')[1].checked = false;
+			 	    		    $("[name='handlingChargeRadio']").prop('disabled',true);
+					    	 	$("#handlingChargesCollectMode").hide();
+					    	 	$("#handligChargeCheck1").prop('disabled',true);
+				    	    }
+				    	 	
+				    	  }
+				      else{
+				  			$("#handlingChargeMode").show();
+				  			//$("#handlingChargesCollectMode").show();
+				  			if($("#handlingChargeMode").length)
+				  			{
+				  				if('NonCash'==$('input[type=radio][name=handlingChargeRadio]:checked').val())
+				  					{
+				  						$("#handlingChargesCollectMode").show();
+				  					}
+				  				else
+				  					{
+				  						$("#handlingChargesCollectMode").hide();
+				  					}
+				  				$("#handligChargeCheck1").prop('disabled',false);
+				  			}
+					  	} 
+				}
+				else
+				{
+					// for create submission
+					$("#handlingChargeMode").show();
+		  			$("#handlingChargesCollectMode").hide();
+				}
+			    // put it inside if condition
+			  
+			    
+			    
+			    
+			    
+			
+			      $("[name='modeOfPayment']").change(function(){
+			    	  var totalAmountHandlingChrg = $('#totalAmount').val();
+			    	 
+				      if (this.value == 'Single') {
+					      if($('#handlingCharge').length)
+					      {
+					    	  
+					    	  
+					    	  $("#instrAmountStr1").val(totalAmountHandlingChrg);
+					    	  $("#instrAmountStr1").val(totalAmountHandlingChrg);
+					    	 // $("#handligChargeCheck1").attr('checked', true);
+					    	  if($('#handlingCharge').val()!=0){
+					    	  	$("#handligChargeCheck1").prop("checked", true);
+					    	  }
+					    	  /* $("#handligChargeCheck1").prop('disabled',true); */
+					    	
+					      }
+				      
+				      
+				      }
+				      else if(this.value == 'Multiple')
+				      {
+				     	 if($('#handlingCharge').length)
+				      	{
+				      		$("#totalInstrAmount").val(totalAmountHandlingChrg);
+				      		
+				      		$('#handligChargeCheck1').attr('checked', false);
+					    	 /*  $("#handligChargeCheck1").prop('disabled',false); */
+				     	 }
+				      }
+			      
+			      });
+			      
+		
+			        
+			      $('input[type=radio][name=handlingChargeRadio]').change(function()
+			    	{
+			    	
+			    	  if (this.value == 'NonCash' ) {
+			    		  $('input:radio[name=handlingChargeRadio]')[0].checked = false;
+			    		  $('input:radio[name=handlingChargeRadio]')[1].checked = true;
+			      		   $("#handlingChargesCollectMode").show();
+			   			 }
+			   			
+			    	 
+			   			 else{
+			   			  $("#handlingChargesCollectMode").hide();
+			   			 } 
+			    
+					});     
+	      
+	}
+	 
+
+	        if($('#handlingChargeTR').length == 0)
+	         {
+	            $( '[id^="handligChargeTr04"]').hide();
+	            if($("#printHCReceipt").length){
+	                $("#printHCReceipt").hide();
+	            }
+	           
+	         }
+	//eoa if for handling charge
+	//eoa for  CR29_24122019_Handling_Charges - end
+	
+		// CR10_29082016_Rajasthan_SDSublables : END
+		
+	   	
+	   	
+	   	
+	   	
+ 		//Added for CR63_Karnataka
+		 
+		//EOA for CR63_Karnataka
+	   	
+	   	
+		
+		//Added for CR45-Odisha Offline Changes starts here
+		
+		//CR45-Odisha Offline Changes ends here
+		/*CR14_09082017_Bihar_MultipleHeads - START*/
+	
+		/*CR14_09082017_Bihar_MultipleHeads - END*/
+		
+		//handlingcharge except bihar and rajasthan
+		var totalAmoutHCandSD=0;
+		$("[name='TextField28']").change(function(){
+			var sdAmountStr = $("[name='TextField28']").val();
+			var sdAmount=parseInt(sdAmountStr);
+		  if($('#handlingCharge').length){				
+				var handlingChrg = '';
+				var srviceFee=0;
+				var totalAmoutHCandSD=0;
+			
+				
+				  if( sdAmount ==0)
+				  {
+		        	  $("#handlingCharge").val(0);
+			          $("#totalAmount").val(0); 
+			          $("#handlingChargeMode").show();
+			          if($("#handlingChargeMode").length){
+            		 	 $('input:radio[name=handlingChargeRadio]')[0].checked = false;
+       	    		  	$('input:radio[name=handlingChargeRadio]')[1].checked = false;
+       	    		  	$("[name='handlingChargeRadio']").prop('disabled',true);
+   			  		  	$("#handlingChargesCollectMode").hide();
+  			  			$("#handligChargeCheck1").prop("checked", false);
+
+   			  			$("#handligChargeCheck1").prop('disabled',true);
+
+			          }
+   			  	      updateAmtBeingUtlzForHandling(sdAmount, 0, 0);
+		          }
+				  else{
+				
+				
+						$.ajax({ type: "POST",   
+				         url: "/eStampIndia/submission/SubmissionServlet",   
+				         data: { rDoAction: "getHandlingCharge", amount : sdAmountStr} ,
+				         success : function(text)
+				         {
+				             handlingChrg = text;
+				             srviceFee=parseInt(handlingChrg);
+				             if(srviceFee==0)
+		    			  		{
+			           			  	$("#handlingChargeMode").show();
+			           			 if($("#handlingChargeMode").length)
+			           			 {
+			           				 
+			            		 	$('input:radio[name=handlingChargeRadio]')[0].checked = false;
+			       	    		    $('input:radio[name=handlingChargeRadio]')[1].checked = false;
+			       	    		    $("[name='handlingChargeRadio']").prop('disabled',true);
+		    			  			$("#handlingChargesCollectMode").hide();
+			   			  			 $("#handligChargeCheck1").prop("checked", false);
+
+			   			  			$("#handligChargeCheck1").prop('disabled',true);
+
+			           			 }
+		    			  		}
+		    			  	else{
+		    			  		 $("#handlingChargeMode").show();
+		    			  	     $("[name='handlingChargeRadio']").prop('disabled',false);
+			           			  		if('NonCash'==$('input[type=radio][name=handlingChargeRadio]:checked').val())
+					  					{
+					  						$("#handlingChargesCollectMode").show();
+					  					}
+					  					else
+					  					{
+					  						$("#handlingChargesCollectMode").hide();
+					  					}
+				   			  			$("#handligChargeCheck1").prop('disabled',false);
+				   			  		if( $("[name='modeOfPayment']").val()=="Single")
+					   			  		 {
+											 $("#handligChargeCheck1").prop("checked", true);	
+					   			  		 }
+
+		    			  	   }
+				             totalAmoutHCandSD=srviceFee+sdAmount;
+				             $("#handlingCharge").val(srviceFee);
+				             $("#totalAmount").val(totalAmoutHCandSD);
+				             
+				             updateAmtBeingUtlzForHandling(sdAmount, srviceFee, totalAmoutHCandSD);
+				             
+				         
+				         }
+			      
+				    	});//ajax
+		    		}//else
+		    
+		    }
+		  else {
+				 
+			  		sdAmtAsInstrAmt(sdAmount); 
+			  	
+			
+		      }
+		    
+        });
+		
+		
+
+        
+	        /*CR29_24122019_HandlingCharges,start by soumitri*/
+	      $("[name='printHCReceipt']").click(function(){
+	    	  window.open('/eStampIndia/submission/SubmissionServlet?rDoAction=PRINTHCRECEIPT','','toolbar=no,location=no,directories=no,status=no,menubar=yes,scrollbars=yes,resizable=yes,width=850,height=550');
+		 });
+	      /*CR29_24122019_HandlingCharges,end by soumitri*/ 
+	});
+</script>
+<!--CR08_25072016_integrationwithCSC, end-->
+
+<form name="frmCrtSub" method="post">
+
+<!-- CR08_25072016_integrationwithCSC, start -->
+<!-- SREI -->
+
+<!-- SREI -->
+<!-- CR08_25072016_integrationwithCSC, end -->
+
+	
+	<input type="hidden" id="cashInstrLimitMessage" value="0">
+	
+	
+<table width="1200" border="0" cellpadding="1" cellspacing="2" height="1" align="left">
+
+	<tbody><tr align="left">
+		<td align="left">
+
+			<table border="0" cellspacing="3" cellpadding="3">
+				<tbody><tr>
+					<td class="title" align="left">
+						E-Stamping - Create Submission 
+					</td>
+				</tr>
+				
+				<!-- CR02_16022016_PAN, to display base details for additional stamp duty during update of missing pan -->
+				
+				<!-- CR02_16022016_PAN, end -->
+				
+				
+				 
+				
+				
+						<!-- CR05_27032017 starts -->
+				 
+				
+				<!-- CR05_27032017 ends -->
+			</tbody></table>
+		</td>
+	</tr>
+	
+	
+	<!-- CR15_04082020_Punjab_Area_Of_Property_Changes starts here -->
+	
+	<tr align="left">
+		<td align="left">
+			<table width="800" cellpadding="5" cellspacing="2">
+					
+<tbody><tr><td colspan="2"> 
+<br><table border="0" cellpadding="0" cellspacing="0"><tbody><tr>
+<td width="10" style="background-color: #CC7A00"> 
+<img src="/trade/esi/images/pfk_spacer.gif" width="10" height="20"> </td> 
+ <td class="txt-label" width="800" style="background-color : #e7e7e7"> 
+<b>&nbsp;Main Submission Details</b> 
+</td></tr><tr><td class="txt-body" colspan="2"> 
+<span class="asterisk"> * </span>Indicates that the input field is mandatory.</td></tr></tbody></table>
+
+
+</td></tr><tr><td class="txt-label" width="300">Account Reference:</td><td class="txt-body" width="450"><div align="left">NEWIMPACC (SV)/ up16051104/ GAUTAMBUDDH NAGAR 1/ UP-GBN</div></td></tr>
+
+<input type="hidden" name="Label2" value="NEWIMPACC (SV)/ up16051104/ GAUTAMBUDDH NAGAR 1/ UP-GBN">
+
+<input type="hidden" name="HIDDENTEXTFIELD3" value="">
+
+<input type="hidden" name="HIDDENTEXTFIELD4" value="">
+
+<input type="hidden" name="HIDDENTEXTFIELD5" value="">
+
+<tr><td class="txt-label" width="300">Purchased by<span class="asterisk"> * </span>:</td><td class="txt-body" width="450"><div align="left"><input type="text" class="input" name="TextField6" id="TextField6Mand" value="" maxlength="50" size="40" onkeypress="validateAlpha(TextField6)" onblur="validateAlpha(TextField6) "></div></td></tr>
+
+<tr><td class="txt-label" width="300">Description of Document<span class="asterisk"> * </span>:</td><td class="txt-body" width="450"><div align="left">Article 4 Affidavit</div></td></tr>
+
+<input type="hidden" name="Label7" value="Article 4 Affidavit">
+
+<tr><td class="txt-label" width="300">Property Description:</td> 
+<td class="txt-body" width="450"> 
+<div align="left"> 
+<textarea class="input" name="TextArea8" id="TextArea8Mand" cols="40" rows="3" onkeyup="textCounter(this, 100, event);validateTextarea(this);" onchange="validateTextarea(this);" onblur="replaceEnterKey(this, ' ');"></textarea></div></td></tr> 
+
+
+<tr><td class="txt-label" width="300">Consideration Price (Rs.):</td><td class="txt-body" width="450"><div align="left"><input type="text" class="input" name="TextField9" id="TextField9Mand" value="0.00" maxlength="40" size="40" onkeypress="validateAlphaNum(TextField9),  allowOnlyNumeric()" onchange="validateAlphaNum(TextField9),  checknumber(this),  checkForDecimalPlaces(this) , doRounding(this)  , setMyValue(this) , convertNumberToWords(this)"></div></td></tr>
+
+<tr><td colspan="2"> 
+<br><table border="0" cellpadding="0" cellspacing="0"><tbody><tr>
+<td width="10" style="background-color: #CC7A00"> 
+<img src="/trade/esi/images/pfk_spacer.gif" width="10" height="20"> </td> 
+ <td class="txt-label" width="800" style="background-color : #e7e7e7"> 
+<b>&nbsp;First Party Details</b> 
+</td></tr></tbody></table>
+
+
+</td></tr><tr><td class="txt-label" width="300">First Party<span class="asterisk"> * </span>:</td><td class="txt-body" width="450"><div align="left"><input type="text" class="input" name="TextField11" id="TextField11Mand" value="" maxlength="50" size="40" onblur="validatePartyname(this, ' '); validateAlpha(TextField11);" onkeypress="validateAlpha(TextField11)"></div></td></tr>
+
+<tr><td class="txt-label" width="300">Address Line 1:</td><td class="txt-body" width="450"><div align="left"><input type="text" class="input" name="TextField12" id="TextField12Mand" value="" maxlength="40" size="40" onkeypress="validateAddressField(TextField12)" ,="" onblur="validateAddressField(TextField12)"></div></td></tr>
+
+<tr><td class="txt-label" width="300">Address Line 2:</td><td class="txt-body" width="450"><div align="left"><input type="text" class="input" name="TextField13" id="TextField13Mand" value="" maxlength="40" size="40" onkeypress="validateAddressField(TextField13)" ,="" onblur="validateAddressField(TextField13)"></div></td></tr>
+
+<tr><td class="txt-label" width="300">Address Line 3:</td><td class="txt-body" width="450"><div align="left"><input type="text" class="input" name="TextField14" id="TextField14Mand" value="" maxlength="40" size="40" onkeypress="validateAddressField(TextField14)" ,="" onblur="validateAddressField(TextField14)"></div></td></tr>
+
+<tr><td class="txt-label" width="300">Pin Code:</td><td class="txt-body" width="450"><div align="left"><input type="text" class="input" name="TextField15" id="TextField15Mand" value="" maxlength="40" size="40" onchange="allowOnlyNumber(this)"></div></td></tr>
+
+<tr><td class="txt-label" width="300">Pan No:</td><td class="txt-body" width="450"><div align="left"><input type="text" class="input" name="TextField16" id="TextField16Mand" value="" maxlength="40" size="40" onchange="validatePAN(this)"></div></td></tr>
+
+<tr><td colspan="2"> 
+<br><table border="0" cellpadding="0" cellspacing="0"><tbody><tr>
+<td width="10" style="background-color: #CC7A00"> 
+<img src="/trade/esi/images/pfk_spacer.gif" width="10" height="20"> </td> 
+ <td class="txt-label" width="800" style="background-color : #e7e7e7"> 
+<b>&nbsp;Second Party Details</b> 
+</td></tr></tbody></table>
+
+
+</td></tr><tr><td class="txt-label" width="300">Second Party:</td><td class="txt-body" width="450"><div align="left"><input type="text" class="input" name="TextField18" id="TextField18Mand" value="" maxlength="50" size="40" onblur="validatePartyname(this, ' '); validateAlpha(TextField18);" onkeypress="validateAlpha(TextField18)"></div></td></tr>
+
+<tr><td class="txt-label" width="300">Address Line 1:</td><td class="txt-body" width="450"><div align="left"><input type="text" class="input" name="TextField19" id="TextField19Mand" value="" maxlength="40" size="40" onkeypress="validateAddressField(TextField19)" ,="" onblur="validateAddressField(TextField19)"></div></td></tr>
+
+<tr><td class="txt-label" width="300">Address Line 2:</td><td class="txt-body" width="450"><div align="left"><input type="text" class="input" name="TextField20" id="TextField20Mand" value="" maxlength="40" size="40" onkeypress="validateAddressField(TextField20)" ,="" onblur="validateAddressField(TextField20)"></div></td></tr>
+
+<tr><td class="txt-label" width="300">Address Line 3:</td><td class="txt-body" width="450"><div align="left"><input type="text" class="input" name="TextField21" id="TextField21Mand" value="" maxlength="40" size="40" onkeypress="validateAddressField(TextField21)" ,="" onblur="validateAddressField(TextField21)"></div></td></tr>
+
+<tr><td class="txt-label" width="300">Pin Code:</td><td class="txt-body" width="450"><div align="left"><input type="text" class="input" name="TextField22" id="TextField22Mand" value="" maxlength="40" size="40" onchange="allowOnlyNumber(this)"></div></td></tr>
+
+<tr><td class="txt-label" width="300">Pan No:</td><td class="txt-body" width="450"><div align="left"><input type="text" class="input" name="TextField23" id="TextField23Mand" value="" maxlength="40" size="40" onchange="validatePAN(this)"></div></td></tr>
+
+<tr><td class="txt-label" width="300">Stamp Duty Paid By<span class="asterisk"> * </span>:</td><td class="txt-body" width="450"><div align="left"><input type="text" class="input" name="TextField24" id="TextField24Mand" value="" maxlength="50" size="40" onkeypress="validateAlpha(TextField24)" onblur="validateAlpha(TextField24) , sdPaidByAsPaymentModeName(this) "></div></td></tr>
+
+<input type="hidden" name="HIDDENTEXTFIELD25" value="Affidavit">
+
+<input type="hidden" name="HIDDENTEXTFIELD26" value="up16051104">
+
+<input type="hidden" name="HIDDENTEXTFIELD27" value="">
+
+<tr><td colspan="2"> 
+ <hr> </td></tr><tr><td class="txt-label" width="300">Stamp Duty Amount(Rs.)<span class="asterisk"> * </span>:</td><td class="txt-body" width="450"><div align="left"><input type="text" class="input" name="TextField28" id="TextField28Mand" value="0" maxlength="40" size="40" onkeypress="validateAlphaNum(TextField28),  allowOnlyNumeric()" onchange="validateAlphaNum(TextField28),  checknumber(this),  checkForDecimalPlaces(this) , doRoundingWithoutDecimal(this)  , sdAmtAsPaymentModeInstrAmt(this), convertNumberToWords(this), panform60man(this)"></div></td></tr><tr><td colspan="2"> 
+ <hr> </td></tr>
+
+<tr id="panform60"><td class="txt-label" width="300">Stamp Duty Amount Payer's PAN or Details of FORM 60</td><td class="txt-label"><input type="radio" class="txt-label" name="panform" checked="checked" value="pan" id="pan" onclick="panform60Mandatory(), panFormSelect() ">PAN  <input type="radio" class="txt-label" name="panform" value="form60" id="form60" onclick="panform60Mandatory(), panFormSelect()">Form 60<input type="radio" class="txt-label" name="panform" value="exempted" id="exempted" onclick="panform60Mandatory(), panFormSelect()">Exempted</td></tr>
+
+
+<tr><td class="txt-label" width="300">Proof of Identity:</td> 
+<td class="txt-body" width="450"> 
+<div align="left"> 
+<select style="width:300px;" disabled="" class="input" size="1" name="IdentityProofCombo" id="IdentityProofComboMand"> 
+<option value="" selected="">Select</option> 
+<option value="AADHAR Card">
+AADHAR Card</option><option value="Arm license">
+Arm license</option><option value="Bank/Post office passbook bearing photograph">
+Bank/Post office passbook bearing photograph</option><option value="Certificate from employer">
+Certificate from employer</option><option value="Caste or Domicile certificate bearing photograph">
+Caste or Domicile certificate bearing photograph</option><option value="Central Government Health Scheme Card">
+Central Government Health Scheme Card</option><option value="Certificate of identity signed by a MP or MLA">
+Certificate of identity signed by a MP or MLA</option><option value="Certificate of identity signed by a Gazetted Officer">
+Certificate of identity signed by a Gazetted Officer</option><option value="Certificate of registration issued by Charity Commissioner">
+Certificate of registration issued by Charity Commissioner</option><option value="Certificate of registration issued by Registrar of Cooperative society">
+Certificate of registration issued by Registrar of Cooperative society</option><option value="Certificate of identity signed by a Municipal Councillor">
+Certificate of identity signed by a Municipal Councillor</option><option value="Driving License">
+Driving License</option><option value="Elector photo identity card">
+Elector photo identity card</option><option value="Ex-servicemen Contributory Health Scheme card">
+Ex-servicemen Contributory Health Scheme card</option><option value="Kisan passbook bearing photograph">
+Kisan passbook bearing photograph</option><option value="National Rural Employment Guarantee Scheme Job card">
+National Rural Employment Guarantee Scheme Job card</option><option value="Passport">
+Passport</option><option value="Photo identity card issued by the government/PSU">
+Photo identity card issued by the government/PSU</option><option value="Pensioner Photo card">
+Pensioner Photo card</option><option value="Ration/Public Distribution System card bearing photograph">
+Ration/Public Distribution System card bearing photograph</option><option value="Any other document from any Central or State Government">
+Any other document from any Central or State Government</option></select> 
+</div></td></tr>
+
+
+<tr><td class="txt-label" width="300">Proof of Residence:</td> 
+<td class="txt-body" width="450"> 
+<div align="left"> 
+<select style="width:300px;" disabled="" class="input" size="1" name="AddressProofCombo" id="AddressProofComboMand"> 
+<option value="" selected="">Select</option> 
+<option value="AADHAR Card">
+AADHAR Card</option><option value="Allotment letter of accommodation from Government">
+Allotment letter of accommodation from Government</option><option value="Bank Account Statement">
+Bank Account Statement</option><option value="Bank/Post office passbook bearing photograph">
+Bank/Post office passbook bearing photograph</option><option value="Certificate from employer">
+Certificate from employer</option><option value="Caste or Domicile certificate bearing photograph">
+Caste or Domicile certificate bearing photograph</option><option value="Credit Card statement ">
+Credit Card statement </option><option value="Certificate of identity signed by a MP or MLA">
+Certificate of identity signed by a MP or MLA</option><option value="Certificate of identity signed by a Gazetted Officer">
+Certificate of identity signed by a Gazetted Officer</option><option value="Certificate of registration issued by Charity Commissioner">
+Certificate of registration issued by Charity Commissioner</option><option value="Certificate of registration issued by Registrar of Cooperative society">
+Certificate of registration issued by Registrar of Cooperative society</option><option value="Certificate of identity signed by a Municipal Councillor">
+Certificate of identity signed by a Municipal Councillor</option><option value="Consumer gas card/book or piped gas bill">
+Consumer gas card/book or piped gas bill</option><option value="Driving License">
+Driving License</option><option value="Depository Account Statement">
+Depository Account Statement</option><option value="Elector photo identity card">
+Elector photo identity card</option><option value="Electricity bill">
+Electricity bill</option><option value="Landline Telephone bill">
+Landline Telephone bill</option><option value="National Rural Employment Guarantee Scheme Job card">
+National Rural Employment Guarantee Scheme Job card</option><option value="Passport">
+Passport</option><option value="Passport of spouse bearing name of the person">
+Passport of spouse bearing name of the person</option><option value="Property tax payment receipt">
+Property tax payment receipt</option><option value="Property registration document">
+Property registration document</option><option value="Pensioner Photo card">
+Pensioner Photo card</option><option value="Ration/Public Distribution System card bearing photograph">
+Ration/Public Distribution System card bearing photograph</option><option value="Water bill">
+Water bill</option><option value="Any other document from any Central or State Government">
+Any other document from any Central or State Government</option></select> 
+</div></td></tr>
+
+
+
+<script language="JavaScript"> function checkIfMandFieldEmpty() 
+ { if(!checkMandatoryFields([      'TextField6Mand' , 'TextField11Mand' , 'TextField24Mand' , 'TextField28Mand' ])){ alert('Please enter all the mandatory data.'); 
+ return false;  }  
+ return true; } </script>
+
+<script language="JavaScript"> function checkDateFormat() 
+ { if(!checkMandatoryDateFields([    ])){ alert('Please enter a valid date in the format DD-MON-YYYY.'); 
+ return false;  }  
+ return true; } </script>
+
+
+	</tbody></table>
+	</td>
+	</tr>
+	
+	 
+	
+	<tr align="left">
+		<td align="left">
+			<table width="800" cellpadding="5" cellspacing="2">
+			
+	</table>
+	</td>
+	</tr>
+	<tr align="center">
+		<td align="center">
+			<div id="printStatus" style="BORDER-RIGHT: #000000 1px; BORDER-TOP: #000000 1px; Z-INDEX: 1; BORDER-LEFT: #000000 1px; BORDER-BOTTOM: #000000 1px; POSITION: absolute; HEIGHT: 500px; WIDTH: 100%; display: none">
+				<div align="center">
+					<table border="0" cellpadding="1" cellspacing="0" width="400" height="100">
+						<tbody>
+							<tr bgcolor="#000000">
+								<td>
+									<table border="0" cellpadding="5" cellspacing="0" width="100%" height="100%">
+										<tbody><tr class="txt-body" bgcolor="ffffff" align="center">
+											<td>Certificate generation is in progress ... please wait<br>
+												<img name="pProgressImg" width="78" height="7"></td>
+										</tr>
+									</tbody></table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</td>
+	</tr>
+	<!-- CR15_04082020_Punjab_Area_Of_Property_Changes ends here -->
+	
+	<!-- CR15_04082020_Punjab_Area_Of_Property_Changes ends here -->
+
+	<tr align="left">
+		<td align="left">
+			<table width="1230" cellpadding="5" cellspacing="2">
+		
+					<!-- CR03_13032017_PANEXEMPTED - Added to display reason of exemption and passport number field -->
+					
+
+
+
+
+
+
+
+
+
+ <script>
+	$(document).ready(function(){
+			var exemptedEditable = 'true';
+			var exemptedReasonAvailable = '';
+			var passportAvailable = '';
+			
+			
+		
+		if('false' == exemptedEditable){
+			if(null != exemptedReasonAvailable){
+				document.getElementById("exemptedReasonReadOnly").value = exemptedReasonAvailable;
+				$("#exemptedReason").hide();
+				$("#exemptedReasonReadOnly").show();
+				
+				if(null != passportAvailable){
+					document.getElementById("passportReadOnly").value = passportAvailable;
+					$("#passportNumber").hide();
+					$("#passportReadOnly").show();
+				}
+			}
+		}
+		else{
+			document.getElementById("exemptedReason").value = exemptedReasonAvailable;
+			if("" != passportAvailable || null != passportAvailable){
+				document.getElementById("passportNumber").value = passportAvailable;
+				document.getElementById("passportNumber").removeAttribute('readonly');
+			}
+		}
+		/* CR23_14122018_CashLimit starts here */
+		var isDocVerified = 'true';
+		if('true' == isDocVerified){
+			 $('#panCopyCollected').closest('tr').css('display','table-row');
+			 $('#form60CopyCollected').closest('tr').css('display','none');
+			 $('#exemptionCopyCollected').closest('tr').css('display','none');
+		}
+		
+		var docVerifyEditable = 'false';
+		if('true' == docVerifyEditable){
+			 $('#panCopyCollected').closest('tr').css('display','table-row');
+			 $('#form60CopyCollected').closest('tr').css('display','none');
+			 $('#exemptionCopyCollected').closest('tr').css('display','none');
+			 $( "#panCopyCollected" ).attr( "disabled", false );
+			 $( "#exemptionCopyCollected" ).attr( "disabled", false );
+			 $( "#form60CopyCollected" ).attr( "disabled", false );
+			 $( "#yesVerifiedTINSite" ).attr( "disabled", false );
+			 $( "#noVerifiedTINSite" ).attr( "disabled", false );
+			 $( "#yesVerifyOriginal" ).attr( "disabled", false );
+			 $( "#noVerifyOriginal" ).attr( "disabled", false );
+		}
+		
+		/* CR23_14122018_CashLimit ends here */
+	});
+
+</script>
+
+<script type="text/javascript">
+	
+	function validatePassport(obj){
+		
+		if(document.getElementById("passportNumber")){
+			document.getElementById("passportNumber").style.textTransform = "uppercase";
+			//var passportNumber = document.getElementById("passportNumber").value;
+			
+			var passportValidationRegex = /^[A-Za-z0-9]{5,12}$/;
+			if(!passportValidationRegex.test(obj.value)){
+				alert("Passport number is too short or Invalid. Minimum 5 alphanumeric characters are required.");
+				obj.focus();
+				return true;
+			}
+		}
+	}
+	
+function panVerifyChecked() {
+	
+	document.getElementById("form60CopyCollected").checked = false;
+	document.getElementById("exemptionCopyCollected").checked = false;
+}
+function form60VerifyChecked() {
+	
+	document.getElementById("panCopyCollected").checked = false;
+	document.getElementById("yesVerifiedTINSite").checked = false;
+	document.getElementById("noVerifiedTINSite").checked = true;
+	document.getElementById("yesVerifyOriginal").checked = false;
+	document.getElementById("noVerifyOriginal").checked = true;
+	document.getElementById("exemptionCopyCollected").checked = false;
+}
+function exemptionVerifyChecked() {
+	
+	document.getElementById("panCopyCollected").checked = false;
+	document.getElementById("yesVerifiedTINSite").checked = false;
+	document.getElementById("noVerifiedTINSite").checked = true;
+	document.getElementById("yesVerifyOriginal").checked = false;
+	document.getElementById("noVerifyOriginal").checked = true;
+	document.getElementById("form60CopyCollected").checked = false;
+}
+
+	
+</script>
+
+			<tbody><tr><td class="txt-label" width="200">Reason of Exemption:</td> 
+				<td class="txt-body" width="850"> 
+				<div align="left"> 
+				<input type="text" name="exemptedReasonReadOnly" id="exemptedReasonReadOnly" value="" readonly="readonly" style="display: none; border:0px;">
+				<!-- <input type='label' name='exemptedReasonReadOnly' id='exemptedReasonReadOnly' value="" style="display: none;"/> -->
+				<select style="width:300px;" class="input" size="1" name="exemptedReason" id="exemptedReason" onchange="passportRequired(this)" disabled="">
+				<option value="" selected="">Select </option>
+				
+							<option value="Central Government"> Central Government</option>
+						
+				
+				
+							<option value="Consulate"> Consulate</option>
+						
+				
+				
+							<option value="Non-Residents"> Non-Residents</option>
+						
+				
+				
+							<option value="State Government"> State Government</option>
+						
+				
+				
+			
+			</select>
+			</div></td></tr>
+			<tr>
+  				<td class="txt-label" width="200">Passport Number: </td>  		  		   
+  				<td class="txt-body" width="850"><div align="left"> 
+  				<input type="text" name="passportReadOnly" id="passportReadOnly" value="" readonly="readonly" style="display: none; border:0px;">
+  				<!-- <input type='label' name='passportReadOnly' id='passportReadOnly' value="" style="display: none;"/> -->
+  				<input type="text" class="input" name="passportNumber" id="passportNumber" value="" maxlength="12" size="40" onchange="validatePassport(this)" disabled="">
+  				</div></td>
+  			</tr>
+  			<!-- CR23_14122018_CashLimit starts here -->
+  			<tr name="panCopyCollectedTR" id="panCopyCollectedTR" style="display: table-row;">
+  			<td class="txt-label" width="200"><span class="txt-label">PAN Card copy collected</span><span class="asterisk"> * </span><span class="txt-label"> : </span></td>
+				<td><div align="left"><font class="txt-label">
+				 <input type="radio" name="panCopyCollected" id="panCopyCollected" value="Yes" disabled="disabled" onclick="panVerifyChecked()">Yes</font> 
+			</div></td></tr>
+			<tr name="form60CopyCollectedTR" id="form60CopyCollectedTR" style="display: none;">
+  			<td class="txt-label" width="200"><span class="txt-label">Form 60 copy collected</span><span class="asterisk"> * </span><span class="txt-label"> : </span></td>
+				<td><div align="left"><font class="txt-label">
+				 <input type="radio" name="form60CopyCollected" id="form60CopyCollected" value="Yes" disabled="disabled" onclick="form60VerifyChecked()">Yes</font> 
+			</div></td></tr>
+			<tr name="exemptionCopyCollectedTR" id="exemptionCopyCollectedTR" style="display: none;">
+  			<td class="txt-label" width="200"><span class="txt-label">Exemption copy collected</span><span class="asterisk"> * </span><span class="txt-label"> : </span></td>
+				<td><div align="left"><font class="txt-label">
+				 <input type="radio" name="exemptionCopyCollected" id="exemptionCopyCollected" value="Yes" disabled="disabled" onclick="exemptionVerifyChecked()">Yes</font> 
+			</div></td></tr>
+			<tr name="panVerifyFlag" id="panVerifyFlag"><td class="txt-label" width="100">PAN verification flag</td></tr>
+			
+			<tr name="verifyTINSiteTR" id="verifyTINSiteTR">
+			<td class="txt-label" width="200"><span class="txt-label">Verified from TIN Site</span><span class="asterisk"> * </span><span class="txt-label"> : </span></td>
+				 <td><div align="left"><font class="txt-label">
+				 <input type="radio" name="verifyTINSite" id="yesVerifiedTINSite" value="Yes" disabled="">Yes</font>
+				 <font class="txt-label">
+				 <input type="radio" name="verifyTINSite" id="noVerifiedTINSite" value="No" checked="" disabled="">No</font> 
+			</div></td></tr>
+			
+			<tr name="verifyOriginalTR" id="verifyOriginalTR">
+			<td class="txt-label" width="250"><span class="txt-label">Verified with original</span><span class="asterisk"> * </span><span class="txt-label"> : </span></td>
+				 <td><div align="left"> <font class="txt-label">
+				 <input type="radio" name="verifyOriginal" id="yesVerifyOriginal" value="Yes" disabled="">Yes</font>
+				 <font class="txt-label">
+				 <input type="radio" name="verifyOriginal" id="noVerifyOriginal" value="No" checked="" disabled="">No</font> 
+			</div></td></tr>
+			<!-- CR23_14122018_CashLimit ends here -->
+					<!-- March 14, 2008 -->
+					
+					
+						
+					
+  					<tr>
+  						<td class="txt-label" width="250">ACC Transaction Ref. No : </td>  		  		   
+  						
+  						<td class="txt-body" width="450"><input type="text" class="input" name="pAccTrnRefNo" value="" maxlength="20" size="40" onkeypress="validateAlphaNum(this)" onblur="validateAlphaNum(this)"></td>
+  								
+  						  	
+  					</tr>
+  					<tr><td colspan="2"><hr width="800" align="left"></td></tr>
+  				
+			</tbody></table>
+				
+				<!-- Software Testing Case #132047 - added hidden field -->
+					<input type="hidden" name="uniqueToken" value="">
+					<!-- March 14, 2008 -->
+					<input type="hidden" name="selectedStampTypeId" value="">
+					<input type="hidden" name="changeValue" value="">
+					<input type="hidden" name="stampDutyAmountValue" id="stampDutyAmountValue">
+			<!-- </table> --> <!-- Commented for UAT - #92710 -->
+					<!-- CR21_26082015 - Phase 2 - START-->
+					<input type="hidden" name="rDocId" id="rDocId">
+					
+					
+					<!-- CR21_26082015 - Phase 2 - END-->
+					<!-- Hidden input to flag tampering - //Added for Bug 435754: tampering or automation detection with Auto-fill & Method Tampering Detection -->
+					<input type="hidden" name="autoSubmitDetected" id="autoSubmitDetected" value="false">
+					<input type="hidden" name="seleniumBotFlag" id="seleniumBotFlag" value="false">
+					<!-- Hidden input to flag tampering - //Bug 467150: Implement Detection & Restriction for Submission via Autofill -->
+					<input type="hidden" name="autoFillDirectScanDetected" id="autoFillDirectScanDetected" value="false">	
+					<input type="hidden" name="autoFillShortTimeWindowDetected" id="autoFillShortTimeWindowDetected" value="false">									
+					<input type="hidden" id="firstInteractionTs" value="0">
+					<input type="hidden" id="typedCharCount" name="typedCharCount" value="0">
+					<input type="hidden" id="firstTypeTs" name="firstTypeTs" value="0">
+					
+					<input type="hidden" id="autoFillDetected" value="false">
+					<input type="hidden" id="autoFillLocked" value="false">
+					
+					<input type="hidden" id="typingToken" name="typingToken" value="">
+					<input type="hidden" id="typingTokenTs" name="typingTokenTs" value="">
+
+			
+			
+			
+			
+	       <!-- CR11_29012024_GJ_ACC_NONCASH changes starts here --> 
+	      
+        <!-- CR11_29012024_GJ_ACC_NONCASH changes ends here -->
+	
+	<!-- CR04_21022020_Shcil_imps_SMS_preview_Changes starts here -->
+<!-- Uncommented for Bug 365620 -->
+<!-- Added below condition for CR84_14082024_Razorpay_Create_Submission -->
+
+
+
+			
+			
+			<!-- CR04_21022020_Shcil_imps_SMS_preview_Changes ends here -->
+			
+			
+			
+			
+		<!-- CR19_13082015_CBSINTEGRATION START -->
+			
+  		<!-- CR19_13082015_CBSINTEGRATION END-->		
+  		
+			<table width="1000" cellpadding="5" cellspacing="2">
+			<!-- CR16_06072015 - Capturing Contact Details - Start -->
+				<tbody><tr>
+  					<td colspan="2">
+	  					<table width="800" border="0" cellspacing="0" cellpadding="0">
+						<tbody><tr dir="ltr">
+
+						<td dir="ltr" class="sectionheaderbg" height="19" width="10">
+
+						</td>
+
+						<td dir="ltr" class="ttl-category" height="24" width="792">
+&nbsp;
+						<span class="ttl-predefined"> Other Contact Details </span>
+						</td>
+
+						</tr>
+
+						</tbody></table>
+					</td>
+				</tr>
+  				
+		<!-- contactDetReadOnly field to make it editable and non-editable -->
+		<!-- /* CR45-Odisha Offline Changes starts here */ -->
+		
+  					<tr>
+  						<td class="txt-label" width="250">First Party Mobile No:</td>
+					
+					
+						<td class="txt-label" width="450"><input name="fpMobNo" class="input" type="text" id="fpMobNo" value="" size="40" maxlength="10" onkeypress="allowOnlyNumeric()" onchange="checkLength(this)"></td>
+						
+  					</tr>
+  					
+  					<tr>
+					<td class="txt-label" width="250">First Party Email Id:</td>
+					
+					
+						<td class="txt-body" width="450"><input name="fpEmailId" class="input" type="text" id="fpEmailId" size="40" maxlength="50" value="" onchange="checkEmail(this)"></td>
+					
+				</tr>
+				
+				<tr>
+					<td class="txt-label" width="250">Second Party Mobile No:</td>
+					
+					
+						<td class="txt-body" width="450"><input name="spMobNo" class="input" type="text" id="spMobNo" value="" size="40" maxlength="10" onkeypress="allowOnlyNumeric()" onchange="checkLength(this)"></td>
+					
+				</tr>
+				
+				<tr>
+					<td class="txt-label" width="250">Second Party Email Id:</td>
+					
+					
+						<td class="txt-label" width="450"><input name="spEmailId" class="input" type="text" id="spEmailId" size="40" maxlength="50" value="" onchange="checkEmail(this)"></td>
+					
+				</tr>
+				
+				<!-- CR45-Odisha Offline Changes ends here -->
+				<!-- CR06_05042017, start -->
+				
+				
+				<!-- CR06_05042017, end -->
+				<!-- //Commented as it was impacting odisha flow  -->
+  				<!-- <tr><td colspan="2"><hr width="800" align="left"></td></tr>-->
+  					
+  				<!-- CR16_06072015 - Capturing Contact Details - End -->
+  				</tbody></table>
+  			<!-- I was here -->	
+  		<!-- added for CR12_09062021_TWOFACTORAUTHENTICATION added for Bug Fix: 321902-->
+  		
+  		
+		<!-- --eoa for CR12_09062021_TWOFACTORAUTHENTICATION  -->
+		</td>
+	</tr>
+	<tr>
+	<td>
+	
+	
+	
+	</td>
+	</tr>
+	
+	
+		<tr><td colspan="2"><hr width="800" align="left"></td></tr>
+	
+	
+	
+			<!-- CR16_06072015 - Capturing Contact Details - End -->
+	<tr>
+		<td>
+		<!-- --added for CR12_09062021_TWOFACTORAUTHENTICATION  -->	
+			
+		</td>
+	</tr>
+	<!-- Added CR45-Odisha Offline Changes -->
+	<tr>
+	<td><input type="hidden" name="paymentType" value=""></td>
+	</tr><!-- Added for CR45-Odisha Offline Changes submGen-->
+</tbody></table><!-- Closing table here for UAT - #92710 - For NONSHCIL -->
+	</form></td></tr><tr align="left">
+	<td width="200"></td>
+		<td align="left">
+		&nbsp;&nbsp;
+			<input type="button" name="pBack" value=" &nbsp;&nbsp;&nbsp;Back&nbsp;&nbsp;&nbsp; " class="button" onmouseover="(this.className='buttonover')" onmouseout="(this.className='button')" onclick="backToPrevPage()">
+
+			&nbsp;&nbsp;&nbsp;
+			
+				<input type="button" name="pSave" value=" &nbsp;&nbsp;&nbsp;Save&nbsp;&nbsp;&nbsp; " class="button" onmouseover="(this.className='buttonover')" onmouseout="(this.className='button')" onclick="saveSubmission()">
+
+				&nbsp;&nbsp;&nbsp;
+			
+			
+			
+			
+			<!-- SREI -->
+			
+			<!-- SREI -->
+			
+			<!-- Added Print E-Registration Receipt for CR45_Odisha_Offline_Requirement by Vishnu -->
+			
+			<!-- CR02_16022016_PAN, update button added for pan details update -->
+			
+			<!-- CR45-Odisha Offline Changes starts here SubmGenFor,.jsp-->
+			
+			<!-- CR45-Odisha Offline Changes ends here -->
+			   
+			
+			
+			
+			<!-- CR02_16022016_PAN, end -->
+		</td>
+	</tr>
+	<!-- //added for CR45_odisha_requirment  -->
+<!-- //eoa for CR45_odisha_requirment  -->
+	</tbody></table><!-- Closing table here for UAT - #92710 - For NONSHCIL --> <!-- This line moved from above "I was here" to this location -->
+<script>
+/* var previewCertWindow_width="800", previewCertWindow_height="800"; 
+ * CR14_09082017_Bihar - commented above code and updated width and height to 630 to show print and close button properly
+ */
+var previewCertWindow_width="800", previewCertWindow_height="630";
+var previewCertWindow_left =(screen.width/2) - previewCertWindow_width/2;
+var previewCertWindow_top = (screen.height/2) - previewCertWindow_height/2;
+var styleStr_previewCertWindow ='toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=yes,width='+previewCertWindow_width+',height='+previewCertWindow_height+',left='+previewCertWindow_left+',top='+previewCertWindow_top+',screenX='+previewCertWindow_left+',screenY='+previewCertWindow_top;
+var previewCertWindowHandler = null;
+var submStatusForDeletion=true;
+function showPrintCertPreview()
+{
+	document.frmCrtSub.action = 'SubmissionServlet?rDoAction=ReprintCertificatePreview';
+	<!--  CR17_19092018_ACCBulkLoad -- printing module -->
+	
+	<!--  CR17_19092018_ACCBulkLoad -- printing module -->
+	document.frmCrtSub.submit();
+}
+
+
+function showPrintRegReceiptPreview()
+{
+	document.frmCrtSub.action = 'SubmissionServlet?rDoAction=ReprintRegReceiptPreview';
+	<!--  CR17_19092018_ACCBulkLoad -- printing module -->
+	
+	<!--  CR17_19092018_ACCBulkLoad -- printing module -->
+	document.frmCrtSub.submit();
+}
+
+function showPreviewCert()
+{
+   if(previewCertWindowHandler != null)
+   {
+	   previewCertWindowHandler.close();
+   }
+   previewCertWindowHandler = window.open("SubmissionServlet?rDoAction=SubmissionCertPreview","previewCertWindow", styleStr_previewCertWindow);     
+   <!--Added by Rahul for CR17_19092018_ACCBulkLoad -->
+	
+   if (!previewCertWindowHandler.opener)
+   {
+		previewCertWindowHandler.opener = self;
+   }
+}
+//CR45-Odisha Offline Changes starts here 
+function showPreviewEreg()
+{
+   if(previewCertWindowHandler != null)
+   {
+	   previewCertWindowHandler.close();
+   }
+   previewCertWindowHandler = window.open("SubmissionServlet?rDoAction=SubmissionEregPreview","previewCertWindow", styleStr_previewCertWindow);     
+   
+   if (!previewCertWindowHandler.opener)
+   {
+		previewCertWindowHandler.opener = self;
+   }
+}
+//CR45-Odisha Offline Changes ends here
+
+function computeStampFee()
+{
+	if(checkIfMandFieldEmpty() && checkDateFormat())
+	{
+		document.frmCrtSub.action = 'SubmissionServlet?rDoAction=ComputeSubmission';
+		document.frmCrtSub.submit();
+	}
+}
+
+function backToPrevPage()
+{
+	//CR21_26082015 - Phase 2 - START - Added IF condition
+	
+		document.location.href = '/eStampIndia/submission/SubmissionServlet?rDoAction=LoadStampDuty';
+		
+}
+
+//CR26_18092012_Enhancement to Transaction Reference Number
+function validateTXNRefNumber(){
+	 	
+}
+	
+function setMyValue(field)
+{
+	document.frmCrtSub.changeValue.value = field.value;
+}
+
+function showComputeMessage()
+{
+	alert('Please compute Stamp Duty before saving the submission.');
+	return true;
+}
+// below function is called when Stamp Duty Paid By field is changed
+function sdPaidByAsPaymentModeName(field){
+	
+
+	  //CR84_14082024_Razorpay_Create_Submission changes starts here
+	  
+	//CR84_14082024_Razorpay_Create_Submission changes ends here
+
+}
+//CR29_Setting first party as stamp duty paid by
+//CR13 , replaced accType and stateId check with changeMandatoryField
+function firstPartyAsSdPaidBy(field){
+	
+			document.getElementById("TextField24Mand").value = field.value;
+			return true;  	
+	
+}
+//If second party value deleted, then check for first party value. If there fill that vale in StampDutyPaidBy field.
+function checkFirstPartyAsSdPaidBy(field){
+	 // CR13
+			if(field.value.length == 0){
+				document.getElementById("TextField24Mand").value = document.getElementById("TextField11Mand").value;
+				return true;  	
+			}
+	
+}
+//CR29_END
+// below function is called when Stamp Duty Amount is changed
+function sdAmtAsPaymentModeInstrAmt(field){
+	// CR10_29082016_Rajasthan : If any change to this function then also check function sdAmtAsInstrAmt(stampDutyAmount) for Rajasthan state
+  	  
+           
+  
+			  
+	     
+	     //CR84_14082024_Razorpay_Create_Submission changes starts here
+	     
+		//CR84_14082024_Razorpay_Create_Submission changes ends here
+				
+  	
+	document.frmCrtSub.stampDutyAmountValue.value = field.value; //for NON-SHCIL user to check the StampDuty Amount Constraint on 09-Oct-2009
+}
+
+
+<!-- CR10_29082016_Rajasthan_SDSublables : added below method, this function is same as sdAmtAsPaymentModeInstrAmt(field) , only parameter is different -->
+function sdAmtAsInstrAmt(stampDutyAmount){
+	
+	stampDutyAmount=Math.ceil(stampDutyAmount);//added  for CR45_Odisha_Requirement_Offline
+	
+	  	  
+	           
+	  
+				  		 	
+	  	
+	  
+	 
+			document.frmCrtSub.stampDutyAmountValue.value = stampDutyAmount; //for NON-SHCIL user to check the StampDuty Amount Constraint on 09-Oct-2009
+	  
+	}
+	
+	//Added for CR19_PanjabAdditional
+	function setAmtBeingUtilizedOnLoad(amount){
+		var payMode=document.getElementsByName('modeOfPayment');
+		for (var i = 0; i < payMode.length; i++) {
+		    if (payMode[i].checked) {
+			    var paymentMode=payMode[i].value;
+		        break;
+		    }
+		}
+		
+		// If mode of payment is multiple then update total instrument amount only when stamp duty amount is changed
+		if(paymentMode == "Multiple"){
+			document.getElementById("totalInstrAmount").value = amount;
+		}	
+		else {
+			document.getElementById("instrAmountStr1").value = amount;
+		}
+	}
+	//EOA for CR19_PanjabAdditional
+	
+	
+		<!-- Added for CR45-Odisha Offline Changes -->
+		function calculateServiceFee(totalStampDutyAdditional,totalStampDuty){
+			   
+			    var values1 =  parseFloat(totalStampDutyAdditional);
+				var values2 =  parseFloat(totalStampDuty);
+				
+				var service = '';
+				var servicefee = 0;
+				$.ajax({ type: "POST", 
+	          		 url: "/eStampIndia/submission/SubmissionServlet",  
+	                   data: { rDoAction: "calculateServiceFee", values1 : values1} ,
+	                   success : function(text)
+	                   {	
+					   service = text;
+	                	   servicefee = parseInt(service);
+					   
+	                	   $("[name='TextFieldServiceFee']").val(servicefee);
+						   var totalStampDutyFee = servicefee + totalStampDuty;
+						   
+						   totalStampDutyFee=Math.ceil(totalStampDutyFee) ;//added  for CR45_Odisha_Requirement_Offline
+				           $("[name='TextFieldTotSdAmtFee']").val(totalStampDutyFee);
+						   if(totalStampDutyAdditional > 200000){
+			                 panform60Mandatory();
+	  
+			                 }
+						  
+						   sdAmtAsInstrAmt(totalStampDutyFee);
+						   
+	                  	 }
+	                   
+	          	    });
+			
+		}
+		
+		// CR63_Karnataka start
+		function calculateSdAmt(){
+			   
+		    var stateId =  "IN-UP";
+			var articleId ="UP-RG-23";
+			var consPrice = Number(document.frmCrtSub.TextField9Mand.value);
+		  	if(null!=articleId && ""!=articleId){
+			var responseStr = '';
+			var sdAmntVal = 0;
+			$.ajax({ type: "POST", 
+          		 url: "/eStampIndia/submission/SubmissionServlet",  
+                   data: { rDoAction: "calculateSDAmount", stateId : stateId, articleId : articleId, consPrice : consPrice } ,
+                   success : function(text)
+                   {	
+                	   var resobj = jQuery.parseJSON( text );
+                	   responseStr = text;
+				   	   if(resobj.status== 'SUCCESS')
+				   		{
+				   			$("#TextField28Mand").val(resobj.sdAmount);
+				   			$("#TextField28Mand").readonly = true;//CR10_29012025_PUNJAB_SD_CalC
+				   			document.getElementById('sdAmountToBePaid').innerHTML=resobj.sdAmount;			   		  		
+			   		  		convertNumberToWords(document.getElementById('TextField28Mand'));
+			   		  	   //CR10_29012025_PUNJAB_SD_CalC
+			   		  	    if(stateId == 'IN-PB'){
+			   		  	    	$("#TextFieldSdAmtFee").val(resobj.sdAmount);
+				   		    if($("[name='TextFieldInfraCessFee']").val  != '' ||  $("[name='TextFieldInfraCessFee']").val != 0){
+				   		    	var sdcalAmount = document.getElementById("TextFieldSdAmtFee").value;
+				   		    	var infracess = document.getElementById("TextFieldInfraCessFee").value;
+				   		        var totalStampDutyFee = parseFloat(sdcalAmount) + parseFloat(infracess);
+				   		       
+				   		        $("[name='TextField28']").val(totalStampDutyFee);
+				   		    	$("[name='TextField28']").attr('readonly','true');
+				   		    	sdAmtAsInstrAmt(totalStampDutyFee);
+				   		     } else {
+                                sdAmtAsInstrAmt(resobj.sdAmount);
+							 }
+				           } else if(stateId == 'IN-RJ'){ //CR120_17122024_RJ_SD_Calulator-starts
+			   		  	    
+			   		  	   $("#TextFieldSDPayableMand").val(resobj.sdAmount);
+			   		
+		   		    	   //$("[name='TextFieldSDPayable']").attr('readonly','true'); //CR86_RJSDCALC Changes
+			   		  	   var infraPercent = 0.0;
+						   var cowPercent = 0.0;
+						   var calamitiesPercent = 0.0;
+						  
+						   //CR14_13022026_RJSurchargeInfra Changes start
+						   var consPrice = Number(document.frmCrtSub.TextField9Mand.value);
+						   var baseConsPrice = 0.0;
+							var surchargeInfra = consPrice > baseConsPrice ?  parseInt(calculateSurcharge(resobj.sdAmount,0.0)) : parseInt(calculateSurcharge(resobj.sdAmount,0.0));
+			   		  	    //var surchargeInfra = parseInt(calculateSurcharge(resobj.sdAmount,infraPercent));
+							//CR14_13022026_RJSurchargeInfra Changes end
+
+							var surchargeCow = parseInt(calculateSurcharge(resobj.sdAmount,cowPercent));
+							var surchargeCalamities = parseInt(calculateSurcharge(resobj.sdAmount,calamitiesPercent));//CR38_11112021_CalamatiesSurchargeRJ
+							
+							$("#TextFieldSurchargeInfraMand").val(surchargeInfra);
+							$("#TextFieldSurchargeCowMand").val(surchargeCow) ;
+							$("#TextFieldSurchargeCalamitiesMand").val(surchargeCalamities) ;//CR38_11112021_CalamatiesSurchargeRJ
+					
+							
+				   		    if($("[name='TextFieldSurchargeInfra']").val  != '' ||  $("[name='TextFieldSurchargeInfra']").val != 0 
+				   		    	|| $("[name='TextFieldSurchargeCow']").val  != '' ||  $("[name='TextFieldSurchargeCow']").val != 0
+				   		    	|| $("[name='TextFieldSurchargeCalamities']").val  != '' ||  $("[name='TextFieldSurchargeCalamities']").val != 0){
+				   		    	
+				   		    	var sdcalAmount = document.getElementById("TextFieldSDPayableMand").value;
+				   		    	var infracess = document.getElementById("TextFieldSurchargeInfraMand").value;
+				   		    	var surchargeCow = document.getElementById("TextFieldSurchargeCowMand").value;
+				   		    	var surchargeCalamities = document.getElementById("TextFieldSurchargeCalamitiesMand").value;
+				   		        
+				   		    	var totalStampDutyFee = parseFloat(sdcalAmount) + parseFloat(infracess)+ parseFloat(surchargeCow)+parseFloat(surchargeCalamities);
+				   		       
+				   		        $("[name='TextField28']").val(totalStampDutyFee);
+				   		    	$("[name='TextField28']").attr('readonly','true');
+				   		    	sdAmtAsInstrAmt(totalStampDutyFee);
+				   		     }
+			   		  	    
+			   		  	    } else {
+			   		  	  		sdAmtAsInstrAmt(resobj.sdAmount);
+			   		  	    }
+				   		} else {
+				   		   if(stateId == 'IN-PB'){
+			   		  	    	$("#TextFieldSdAmtFee").val(0);
+			   		  	  		document.getElementById('sdAmountToBePaid').innerHTML="0";
+								alert(resobj.errMsg);
+					   		    if($("[name='TextFieldInfraCessFee']").val  != '' ||  $("[name='TextFieldInfraCessFee']").val != 0){
+					   		    	var infracess = document.getElementById("TextFieldInfraCessFee").value;
+					   		        $("[name='TextField28']").val(infracess);
+					   		    	sdAmtAsInstrAmt(infracess);
+					   		     } else {
+					   		     	 $("#TextField28Mand").val(0);
+					   		     	sdAmtAsInstrAmt(0);
+					   		     }
+			   		  	    } else {
+					   		   $("#TextField9Mand").val(0.00);
+					   		   $("#TextField28Mand").val(0);
+					   			document.getElementById('sdAmountToBePaid').innerHTML="0";
+					   			alert(resobj.errMsg);
+					   			sdAmtAsInstrAmt(0);
+			   		  	    }
+				   		}
+                   }
+          	    });
+			 }
+			}
+		
+		// CR63_Karnataka changes end
+
+function updateAmtBeingUtlzForHandling(stampDutyPayable, handlingCharge, totalHandlingChrg){
+	
+			document.getElementById("stampDutyAmountStr").value = stampDutyPayable;
+		
+			
+			document.frmCrtSub.stampDutyAmountValue.value = stampDutyPayable; // for NONSHCIL user
+			document.getElementById("TextField28Mand").value = stampDutyPayable;
+			sdAmtAsInstrAmt(stampDutyPayable);
+
+				  
+			           
+			  
+						  		 	
+			  	
+			 document.frmCrtSub.stampDutyAmountValue.value = stampDutyAmount; 
+			
+}
+
+
+
+function sdPayableAsStampDutyAmt(stampDutyPayable){
+	//
+}
+
+function calculateSurcharge(stampDutyPayable,percent){
+	
+	var surcharge = (percent/100)*stampDutyPayable;
+	//var surchargeRounding = roundSurcharge(surcharge);
+	//CR03_12022018_SurchargeUpdate - commented above code and added below rounding normal logic
+	var surchargeRounding = Math.round(surcharge);
+	return surchargeRounding ;
+}
+
+function roundSurcharge(surcharge){
+	
+	var surchargeRound;
+	var surchargeStr = surcharge.toString();
+	var decimalPosition = surchargeStr.indexOf(".");
+	
+	//If decimal character present
+    if(decimalPosition >= 0){
+		var res = surchargeStr.split("."); 
+	    var wholeNum = res[0];
+	    var deimalNum = res[1];
+	   
+	    if(parseInt(wholeNum)<10){
+	    	surchargeRound = 10;
+	    }
+	    else if(parseInt(wholeNum)%10 == 0){
+	    	var firstDigit = parseInt(deimalNum.charAt(0)); 
+	    	if(firstDigit>=5){
+	    		surchargeRound = Math.ceil((parseInt(wholeNum)+1)/10)*10;
+		    }else{
+		    	surchargeRound = wholeNum;
+	        }
+	    }
+	    else{
+	    	surchargeRound = Math.ceil(parseInt(wholeNum)/10)*10;
+	    }
+    }
+    else{
+    	// else If whole number is entered
+    	if(surcharge<10){
+	    	surchargeRound = 10;
+	    }
+	    else if(surcharge%10 == 0){
+		   surchargeRound = surcharge;
+	    }
+	    else{
+	    	surchargeRound = Math.ceil(surcharge/10)*10;
+	    }
+    }
+    return surchargeRound;
+}
+
+
+function roundingSurchargeRJ(field){
+	var surcharge = field.value;
+	var decimalPosition = surcharge.indexOf(".");
+	
+	//If decimal character present
+    if(decimalPosition >= 0){
+		var res = surcharge.split("."); 
+	    var wholeNum = res[0];
+	    var deimalNum = res[1];
+	   
+	    if(parseInt(wholeNum)<10){
+	    	field.value = 10;
+	    }
+	    else if(parseInt(wholeNum)%10 == 0){
+	    	var firstDigit = parseInt(deimalNum.charAt(0)); 
+	    	if(firstDigit>=5){
+	    		field.value = Math.ceil((parseInt(wholeNum)+1)/10)*10;
+		    }else{
+		    	field.value = wholeNum;
+	        }
+	    	
+	    }
+	    else{
+	    	field.value = Math.ceil(parseInt(wholeNum)/10)*10;
+	    }
+    }
+    else{
+    	// else If whole number is entered
+    	if(parseInt(surcharge)<10){
+    		field.value = 10;
+	    }
+	    else if(parseInt(surcharge)%10 == 0){
+	    	field.value = surcharge;
+	    }
+	    else{
+	    	field.value = Math.ceil(parseInt(surcharge)/10)*10;
+	    }
+    }
+}
+
+/* 
+ *Commented below code, rounding logic changed as per Rajasthan user requirement
+function roundSurcharge(surcharge){
+	
+	var surchargeRound;
+    var surchargeStr = surcharge.toString();
+    var decimalPosition = surchargeStr.indexOf(".");
+	
+    // for decimal digit
+	if(decimalPosition >= 0){
+	      var surchargeRound;
+	      var afterDecimalDigit = surchargeStr.substring(decimalPosition+1); 
+	      var firstDigit = parseInt(afterDecimalDigit.charAt(0)); 
+
+	      if(firstDigit >= 5){
+	          surchargeRound = Math.round((surcharge+5)/10) * 10 ;
+	      }else{
+	        surchargeRound = Math.round(surcharge);
+			
+	      }
+	  return surchargeRound;
+	}
+	// If there is no decimal digits
+	else{
+		return surcharge;
+	}
+    
+}
+
+function roundingSurchargeRJ(field){
+	
+	
+	var surcharge = field.value;
+    //var surchargeStr = surcharge.toString();
+    var decimalPosition = surcharge.indexOf(".");
+	
+    // for decimal digit
+	if(decimalPosition >= 0){
+	      var surchargeRound;
+	      var afterDecimalDigit = surcharge.substring(decimalPosition+1); 
+	      var firstDigit = parseInt(afterDecimalDigit.charAt(0)); 
+
+	      if(firstDigit >= 5){
+	          surchargeRound = Math.round((parseInt(surcharge)+5)/10) * 10 ;
+	      }else{
+	        surchargeRound = Math.round(parseInt(surcharge));
+			
+	      }
+	      field.value = surchargeRound;
+	}
+	// If there is no decimal digits
+	else{
+		field.value = surcharge;
+	}
+    
+}
+ */
+<!-- CR10_29082016_Rajasthan_SDSublables : END -->
+	
+
+function validatePaidBy()
+{
+	var vFirstParty = document.frmCrtSub.TextField11.value;
+	var vSecondParty = document.frmCrtSub.TextField18.value;
+	var vPaidBy = document.frmCrtSub.TextField24.value;
+    //Added for CR45 odisha offline flow
+	var offlineType = "";
+	var payType = "R";
+	if( vFirstParty != vPaidBy )
+	{
+		/*  Modified for CR45-Odisha Offline Changes */
+		if(vSecondParty != vPaidBy && (offlineType!=null && payType!=offlineType))
+		{
+			alert('Stamp Duty Paid By should be either First Party or Second Party.');
+			document.frmCrtSub.TextField24.focus();
+			return false;
+		}
+		else
+			return true;
+	}
+	else
+		return true;
+}
+
+	/* CR09_31052017_Cashlimit-Statewise */
+	function convertCashLimitToWords1(numVal)   
+{   
+	var junkVal=numVal.value;
+    junkVal=Math.floor(junkVal);   
+    var obStr=new String(junkVal);   
+    numReversed=obStr.split("");   
+    actnumber=numReversed.reverse();   
+  
+    if(Number(junkVal) >=0)   
+    {   
+        //do nothing   
+    }   
+    else  
+    {   
+        alert('Invalid Number');   
+        return false;   
+    }   
+    if(Number(junkVal)==0)   
+    {   
+       // document.getElementById('container').innerHTML=obStr+''+'Rupees Zero Only';   
+        return false;   
+    }   
+    if(actnumber.length>12)   
+    {   
+        alert('The number conversion is allowed only to the length of 12 characters.');   
+        return false;   
+    }   
+  
+    var iWords=["Zero", " One", " Two", " Three", " Four", " Five", " Six", " Seven", " Eight", " Nine"];   
+    var ePlace=['Ten', ' Eleven', ' Twelve', ' Thirteen', ' Fourteen', ' Fifteen', ' Sixteen', ' Seventeen', ' Eighteen', ' Nineteen'];   
+    var tensPlace=['dummy', ' Ten', ' Twenty', ' Thirty', ' Forty', ' Fifty', ' Sixty', ' Seventy', ' Eighty', ' Ninety' ];   
+  
+    var iWordsLength=numReversed.length;   
+    var totalWords="";   
+    var inWords=new Array();   
+    var finalWord="";   
+	var currency="";
+    j=0;   
+    for(i=0; i<iWordsLength; i++)   
+    {   
+		
+        switch(i)   
+        {   
+        case 0:   
+            if(actnumber[i]==0 || actnumber[i+1]==1 )   
+            {   
+                inWords[j]='';   
+            }   
+            else  
+            {   
+                inWords[j]=iWords[actnumber[i]];   
+            }   
+            inWords[j]=inWords[j];   
+            break;   
+        case 1:   
+            tens_complication();   
+            break;   
+        case 2:   
+            hundred_complication();  
+            break;   
+        case 3:   
+			thousand_complication();
+            break;   
+        case 4:   
+            tens_complication();   
+            break;   
+        case 5:   
+			if(actnumber[i]==0 && actnumber[i+1]==0 && (actnumber[i+2] > 0 || actnumber[i+3] > 0 || actnumber[i+4] > 0|| actnumber[i+5] >= 0))   
+            {   
+                inWords[j]= '';   
+            }   
+			else if(actnumber[i]==0 || actnumber[i+1]==1 ) 
+			{
+				inWords[j]= " Lakh";
+			}
+            else  
+            {   
+                inWords[j]=iWords[actnumber[i]]+" Lakh";   
+            }   
+               
+            break;   
+        case 6:   
+            tens_complication();   
+            break;   
+        case 7:   
+            if(actnumber[i]==0 || actnumber[i+1]==1 )   
+            {   
+                inWords[j]='';   
+            }   
+            else  
+            {   
+                inWords[j]=iWords[actnumber[i]];   
+            }   
+            inWords[j]=inWords[j]+" Crore";   
+            break;   
+        case 8:   
+            tens_complication();   
+            break;   
+		case 9:
+			hundred_complication();
+			break;
+		case 10:
+			thousand_complication();
+			break;
+		case 11:   
+            tens_complication();   
+            break;
+        default:   
+            break;   
+        }   
+        j++;   
+    }   
+  
+    function tens_complication()   
+    {   
+        if(actnumber[i]==0)   
+        {   
+            inWords[j]='';   
+        }   
+        else if(actnumber[i]==1)   
+        {   
+            inWords[j]=ePlace[actnumber[i-1]];   
+        }   
+        else  
+        {   
+            inWords[j]=tensPlace[actnumber[i]];   
+        }   
+    }   
+
+	function hundred_complication()
+	{
+		 if(actnumber[i]==0)   
+            {   
+                inWords[j]='';   
+            }   
+            else if(actnumber[i-1]!=0 || (actnumber[i]!=0 && actnumber[i-2]!=0))   
+            {   
+                inWords[j]=iWords[actnumber[i]]+' Hundred and ';   
+            }   
+            else  
+            {   
+                inWords[j]=iWords[actnumber[i]]+' Hundred ';   
+            }
+	}
+	
+	function thousand_complication()
+	{
+		if(actnumber[i]==0 && actnumber[i+1]==0 && (actnumber[i+2] > 0 || actnumber[i+3] > 0 || actnumber[i+4] > 0 || actnumber[i+5] > 0 || actnumber[i+6] > 0 || actnumber[i+7] >= 0))
+			{
+				inWords[j]='';
+			}
+			else if(actnumber[i]==0 || actnumber[i+1]==1)   
+			{   
+			    inWords[j]=" Thousand ";  
+			} 
+			else 
+			{
+				inWords[j]=iWords[actnumber[i]]+" Thousand ";
+			}
+	}
+
+    inWords.reverse();   
+    for(i=0; i<inWords.length; i++)   
+    {   
+        finalWord+=inWords[i];   
+    }   
+
+	if(finalWord == " One")
+		currency = " Rupee";
+	else
+		currency = " Rupees";
+	return(finalWord+currency);
+	} 
+
+
+
+
+function saveSubmission()
+{
+	//Added for Bug 435754: tampering or automation detection with Auto-fill & Method Tampering Detection
+	detectOverrides();
+	//EOA for Bug 435754: tampering or automation detection with Auto-fill & Method Tampering Detection
+	//Added for Bug 467150: Implement Detection & Restriction for Submission via Autofill
+	var uniqueDocRefNo= $("[name='HIDDENTEXTFIELD5']").val(); 
+	if(uniqueDocRefNo !=null && uniqueDocRefNo!="")
+	{
+		document.getElementById("autoFillShortTimeWindowDetected").value = "false";
+		document.getElementById("autoFillDirectScanDetected").value = "false";
+	} else {
+		// Detect autofill again just before submit
+		detectAutoFillDirectScan();
+		var typed = parseInt(
+			document.getElementById("typedCharCount").value || "0",
+			10
+		);
+		var firstTs = parseInt(
+			document.getElementById("firstTypeTs").value || "0",
+			10
+		);
+		var typingTokenVal = parseInt(
+			document.getElementById("typingToken").value || "0",
+			10
+		);
+		var typingTokenTsVal = parseInt(
+			document.getElementById("typingTokenTs").value || "0",
+			10
+		);
+		var now = Date.now();
+		// Autofill ever detected and BLOCK FOREVER
+		if (document.getElementById("autoFillDetected").value === "true") {
+			document.getElementById("autoFillDirectScanDetected").value = "true";
+			//alert("Autofill ever detected and BLOCK FOREVER.");
+		}
+		// Typing too fast (automation pattern)
+		if (firstTs && (now - firstTs) < 3000) {
+			document.getElementById("autoFillShortTimeWindowDetected").value = "true";
+			//alert("Automated input detected.");
+		}
+		if (typingTokenVal == null || typingTokenTsVal == null) {
+			document.getElementById("autoFillShortTimeWindowDetected").value = "true";
+			//alert("No trusted typing token");
+		}
+		if (typingTokenTsVal && (now - typingTokenTsVal) < 3000) {
+			document.getElementById("autoFillShortTimeWindowDetected").value = "true";
+			//alert("Please take a moment to enter details manually.");
+		}		
+	}
+	//EOA for Bug 467150: Implement Detection & Restriction for Submission via Autofill
+	//CR84_14082024_Razorpay_Create_Submission changes starts here
+    
+    //CR84_14082024_Razorpay_Create_Submission changes ends here
+	/* CR31_23092021 - Mark */
+	if(typeof window.checkInstrumentDate == 'function'){
+		if(!checkInstrumentDate()) alert("Cheque is more than 3 months (92 days) old, can be entered only if there is a clear credit in the bank account.");
+	}
+	/* CR31_23092021 ends */
+	//CR11_29012024_GJ_ACC_NONCASH changes starts here
+	 var isExist = "false";
+			
+     //CR11_29012024_GJ_ACC_NONCASH changes ends here
+	
+	/*CR11_15042020_Consideration price Changes starts here*/   
+    var consPriceFlag = 'NO';
+    /*Added for CR45 odisha changes*/   
+    var payType = "R";
+	var offlineType = "";
+	
+  
+    if(consPriceFlag == "YES" && Number(document.frmCrtSub.TextField9Mand.value) == 0.00){
+        alert("Consideration price cannot be 0 for the selected article");
+        return;
+    }
+    //Added for CR63_Karnataka
+    
+ 	//EOA for CR63_Karnataka
+    
+    /*CR11_15042020_Consideration price Changes ends here*/
+    //CR69_11122023 changes starts here
+	var accName = '';
+	var firstParty = document.frmCrtSub.TextField11.value;
+	var	secondParty = document.frmCrtSub.TextField18.value;
+	if(null != accName && "" != accName && (accName.toLowerCase() != firstParty.toLowerCase() && accName.toLowerCase() != secondParty.toLowerCase())){
+		alert('Either of the party name should be the ACC Name.');
+		return false;
+	}
+	//CR69_11122023 changes ends here
+    //Added for CR45-Odisha Offline Changes
+    
+    
+    //CR45-Odisha Offline Changes ends 
+    //Added for CR05_10012025 CHANGES
+    
+    
+   //CR19_170202023_Punjab_New_Heads
+   
+  // CR19_170202023_Punjab_New_Heads - end
+ 
+ 	//added for CR12_19042022_AP_NewHeads
+	
+	//added for CR12_19042022_AP_NewHeads end
+	
+	/* CR15_04082020_Punjab_Area_Of_Property_Changes starts here */
+	
+	/* CR15_04082020_Punjab_Area_Of_Property_Changes ends here */
+	
+	
+	
+	/* Uncommented for Bug 365620 */
+	/* CR04_21022020_Shcil_imps_SMS_preview_Changes starts here */	
+	
+	/* CR04_21022020_Shcil_imps_SMS_preview_Changes ends here */
+	
+	//CR84_14082024_Razorpay_Create_Submission changes starts here
+	
+	//CR84_14082024_Razorpay_Create_Submission changes ends here
+	
+	if(checkIfMandFieldEmpty() && checkDateFormat() && validatePaidBy() )
+	{	
+		<!-- CR10_29082016_Rajasthan_SDSublables : For Rajasthan state -->
+		
+		
+		<!-- CR10_29082016_Rajasthan_SDSublables : END -->
+		
+		<!-- CR14_09082017_Bihar_MultipleHeads -START-->
+		
+		
+		<!-- CR14_09082017_Bihar_MultipleHeads -END-->
+		
+		// CR19_20112017_Bihar added c:if condition by srikanth
+		//Added for CR45-Odisha Offline Changes
+		
+			// added for  for CR63_Karnataka //CR94_19092024_GJ_SDCalculator Changes
+		
+		if("0" == document.frmCrtSub.TextField28.value)
+		{			
+			alert('Stamp duty Amount cannot be zero.');
+			return;
+		}
+		
+		
+		//Added for CR19_170202023_Punjab_New_Heads  //Added TextFieldSdAmtFee for BugId:352358 
+		
+	    
+	    //CR19_170202023_Punjab_New_Heads - END
+	    
+	   /*   */
+		
+		
+
+		
+			
+			
+			// CR02_16022016_PANFORM60_Mandatory starts
+			//CR03_13032017_PANEXEMPTED- Below code has been modified for PAN exemption
+			if((document.getElementById("IdentityProofComboMand")) && (document.getElementById("AddressProofComboMand")) 
+					&& (document.getElementById("exemptedReason"))){
+			if(document.getElementById("TextField16Mand")!=null){
+		        var firstPAN = document.getElementById("TextField16Mand").value;
+			}
+			else{
+		        var firstPAN = document.frmCrtSub.TextField16.value;
+			}
+			if(document.getElementById("TextField23Mand")!=null){
+		        var secondPAN = document.getElementById("TextField23Mand").value;
+			}
+			else{
+		        var secondPAN = document.frmCrtSub.TextField23.value;
+			}
+		    if(document.getElementById("IdentityProofComboMand")!=null){
+		        var poi = document.getElementById("IdentityProofComboMand").value;
+			}
+			else{
+		        var poi = document.frmCrtSub.IdentityProofCombo.value;
+			}
+		    if(document.getElementById("AddressProofComboMand")!=null){
+		        var por = document.getElementById("AddressProofComboMand").value;
+			}
+			else{
+		        var por = document.frmCrtSub.AddressProofCombo.value;
+			}
+			if(firstPAN.length > 0) {
+				if(validatePAN(document.getElementById("TextField16Mand"))) {
+					document.getElementById("TextField16Mand").focus();
+					return false;
+				}
+			}
+			if(secondPAN.length > 0){
+				 if(validatePAN(document.getElementById("TextField23Mand"))) {
+					document.getElementById("TextField23Mand").focus();
+					return false;
+				}
+			}
+//Modiifed for CR45-Odisha Offline Changes
+			if(("R"==offlineType || "B"==offlineType) && document.getElementById("TextFieldTotSdAmtFee")!=null){
+				var SDamount = document.frmCrtSub.TextFieldTotSdAmtFee.value;
+				
+			}
+			else if(document.getElementById("TextField28Mand") != null){
+				var SDamount = document.getElementById("TextField28Mand").value;
+			}
+			else{
+				if(document.getElementById("TextField28")!=null){
+				var SDamount = document.frmCrtSub.TextField28.value;
+				}
+			}
+			/* CR03_13032017_PANEXEMPTED start */
+			if(document.getElementById("exemptedReason") != null){
+				var exemptionReason = document.getElementById("exemptedReason").value;
+			}
+			else{
+				var exemptionReason = document.getElementById("exemptedReasonReadOnly").value;
+			}
+			if(document.getElementById("passportNumber") != null){
+				var passportNum = document.getElementById("passportNumber").value;
+			}
+			else{
+				var passportNum = document.getElementById("passportNumber").value;
+			}
+			
+				if(exemptionReason == "Non-Residents" && (""== passportNum || null == passportNum)){
+					alert("Please enter Passport Number");
+					document.getElementById("passportNumber").focus();
+					return false;
+				}
+				if(passportNum.length > 0 ){
+					if(validatePassport(document.getElementById("passportNumber"))) {
+						document.getElementById("passportNumber").focus();
+						return false;
+					}
+				}
+			
+			if(null != ''){
+				var additionalStampValue = '';
+				
+				var totalSDamount = +SDamount + +additionalStampValue;
+			}
+		
+			/* CR03_13032017_PANEXEMPTED ends */
+			
+			 if(SDamount > 200000){
+				if(exemptionReason == "" || firstPAN=="" || secondPAN=="" || (poi=="" && por=="")){
+					var p = panform60Mandatory();
+					if(p==false){
+						return false;
+					}
+				}
+			}
+			if(additionalStampValue){
+				if(totalSDamount > 200000){
+				if(exemptionReason == "" || firstPAN=="" || secondPAN=="" || (poi=="" && por=="")){
+					var p = panform60Mandatory();
+					if(p==false){
+						return false;
+						}
+					}
+				}
+			}
+			}
+			// CR02_1602016_PANFORM60_Mandatory Ends
+			/* CR21_01122017_BiharAadhaar Number check starts*/
+			
+			 /* CR21_01122017_BiharAadhaar ends*/
+ 	
+//CR05_27032017 Starts
+//Changes have been made for CR09_31052017_Cashlimit-Statewise
+	
+			//CR05_27032017 Ends
+			
+ 	
+			// CR28 | Min Additional Stamp Duty
+			//Bug #21823, additionalStampDuty is updated to AdditionalStampDuty
+			
+			// CR07_02052014_Validation in property description - UAT
+			if (testIsValidObject(document.frmCrtSub.TextField30)){
+				var pinCodeValue=document.frmCrtSub.TextField30.value;
+				
+				if(pinCodeValue != null && pinCodeValue !='' && pinCodeValue.length != 6 ){
+					alert('Please enter six digit Property Description Pin Code.');
+					document.frmCrtSub.TextField30.focus();
+					return;
+				}
+				// If Pin Code is entered and Property Description field length is more than 93 characters then show error message.
+				if(pinCodeValue != null && pinCodeValue !='' && document.frmCrtSub.TextArea8.value != null && document.frmCrtSub.TextArea8.value  !=''  
+						&& document.frmCrtSub.TextArea8.value.length > 93){
+					
+						alert('Property Description field length cannot be greater than 93 characters.');
+						document.frmCrtSub.TextArea8.focus();
+						return;
+					
+					
+				}
+			}	
+			
+			// CR07_02052014_Validation in property description - END
+			
+			//CR03, added if condition to check for single and multiple mode
+
+				
+			//var minStampDutyLimit = 10;	
+			
+				var minStampDutyLimit=0
+				var maxArticlewiseSDLimit=0
+				
+					 minStampDutyLimit = 10;
+					 maxArticlewiseSDLimit = 
+					    	0;//Added for CR03_13012026
+				
+			if(document.frmCrtSub.stampDutyAmountValue.value!=null && document.frmCrtSub.stampDutyAmountValue.value !='' && document.frmCrtSub.stampDutyAmountValue.value < minStampDutyLimit){	
+				    if("R"==offlineType || "B"==offlineType){
+					alert("Submission not allowed for total amount less than "+minStampDutyLimit+" Rupees.");
+					}else{
+						
+					alert("Submission not allowed for stampduty amount less than "+minStampDutyLimit+" Rupees.");
+					
+					}
+				return false;
+			}
+			//CR03_13012026 starts
+			if (maxArticlewiseSDLimit > 0) {
+				if(Number(document.frmCrtSub.stampDutyAmountValue.value) > maxArticlewiseSDLimit){
+					alert("Submission not allowed for Total stampduty amount more than "+maxArticlewiseSDLimit+" Rupees.");
+					return false;
+				} 
+			}//CR03_13012026 ends
+			
+			if (testIsValidObject(document.frmCrtSub.GenderDropDown29)){
+				
+				var genderStampDutyAmount=0;
+				
+				 genderStampDutyAmount = 0;
+				
+				
+				if (genderStampDutyAmount != null && genderStampDutyAmount != 0){
+					if(document.frmCrtSub.TextField28.value!=null && document.frmCrtSub.TextField28.value !='' && document.frmCrtSub.TextField28.value >= genderStampDutyAmount){	
+						var selectedIndex = document.frmCrtSub.GenderDropDown29.selectedIndex;
+						if (selectedIndex == 0){
+							alert("Please select a gender for stamp duty amount greater than or equal to " + genderStampDutyAmount);
+							return false;
+						}
+					}
+				}
+			}
+		
+		
+			//CR24_13102014_remittance, to check whether stamp duty amount is more than consideration price, starts
+			//CR08_25072016_integrationwithCSC: for nonshcil account also paymentreceiptreadonly check added in below condition
+			
+			//CR24_13102014_remittance, ends`
+			
+			
+				//CR05_13012026_MULTIPLEOF10   Code Starts Here Validation...
+				//sat code add here test - CR 05 31-01-2026 ...sat sat
+			
+			
+			
+			
+			
+			 var stampDutyAmount = document.frmCrtSub.TextField28.value;
+			 
+			 //alert("The Entered Stamp Duty Amount(Rs.)  ---->"+stampDutyAmount);
+			 
+			 if (stampDutyAmount % 10 !== 0) {
+				 alert('Stamp Duty amount should be only in multiples of 10.');
+					return;
+
+			 }
+			
+			
+			
+			
+			
+			//CR05_13012026_MULTIPLEOF10   Code Ends Here... Validation
+			
+			//added by srikanth for additional changes in CR18_16112017-online payment  additional changes starts here
+		    var vFirstParty = document.frmCrtSub.TextField11.value;
+	     	var vSecondParty = document.frmCrtSub.TextField18.value;
+			var vPaidBy = document.frmCrtSub.TextField24.value;
+			
+//Modiifed for CR45-Odisha Offline Changes
+			var fpMobNo = document.getElementById("fpMobNo").value; 
+			var fpEmailId = document.getElementById("fpEmailId").value; 
+			if(payType!=offlineType){
+			var spMobNo = document.getElementById("spMobNo").value; 
+			var spEmailId = document.getElementById("spEmailId").value; 
+			}
+			//Modiifed for CR45-Odisha Offline Changes
+			if(payType!=offlineType){
+			if(fpMobNo.length > 0) {
+				if(allowOnlyNumber(document.getElementById("fpMobNo"))) {
+					document.getElementById("fpMobNo").focus();
+					return false;
+				} else if(checkLength(document.getElementById("fpMobNo"))) {
+					document.getElementById("fpMobNo").focus();
+					return false;
+				}
+			} 
+			if(spMobNo.length > 0) {
+				if(allowOnlyNumber(document.getElementById("spMobNo"))) {
+					document.getElementById("spMobNo").focus();
+					return false;
+				} else if(checkLength(document.getElementById("spMobNo"))) {
+					document.getElementById("spMobNo").focus();
+					return false;
+				}
+			} 
+			if(fpEmailId.length > 0) {
+				if(checkEmail(document.getElementById("fpEmailId"))) {
+					document.getElementById("fpEmailId").focus();
+					return false;
+				} 
+			} 
+			if(spEmailId.length > 0) {
+				if(checkEmail(document.getElementById("spEmailId"))) {
+					document.getElementById("spEmailId").focus();
+					return false;
+				}
+			}
+			
+
+			if( vFirstParty != vPaidBy)
+			{
+				var spMobNo = document.getElementById("spMobNo").value;
+				if(spMobNo==""){
+					alert('Stamp duty is paid by Second Party. Please enter second party mobile No.');
+					document.getElementById("spMobNo").focus();
+					return false;
+				}
+				else if(spMobNo.length > 0) {
+					if(allowOnlyNumber(document.getElementById("spMobNo"))) {
+						document.getElementById("spMobNo").focus();
+						return false;
+					} else if(checkLength(document.getElementById("spMobNo"))) {
+						document.getElementById("spMobNo").focus();
+						return false;
+					}
+				} 
+			}
+			else
+				{
+				var fpMobNo = document.getElementById("fpMobNo").value; 
+				if(fpMobNo==""){
+					alert('Stamp duty is paid by First Party. Please enter first party mobile No.');
+					document.getElementById("fpMobNo").focus();
+					return false;
+				}
+				else if(fpMobNo.length > 0) {
+					if(allowOnlyNumber(document.getElementById("fpMobNo"))) {
+						document.getElementById("fpMobNo").focus();
+						return false;
+					} else if(checkLength(document.getElementById("fpMobNo"))) {
+						document.getElementById("fpMobNo").focus();
+						return false;
+					}
+				} 
+				}
+			}else{
+				if(fpMobNo==""){
+						alert('Please enter Stamp duty Payer mobile No.');
+						document.getElementById("fpMobNo").focus();
+						return false;
+					}
+				if(fpMobNo.length > 0) {
+				if(allowOnlyNumber(document.getElementById("fpMobNo"))) {
+					document.getElementById("fpMobNo").focus();
+					return false;
+				} else if(checkLength(document.getElementById("fpMobNo"))) {
+					document.getElementById("fpMobNo").focus();
+					return false;
+				}
+			} 
+			
+			if(fpEmailId.length > 0) {
+				if(checkEmail(document.getElementById("fpEmailId"))) {
+					document.getElementById("fpEmailId").focus();
+					return false;
+				} 
+			} 
+			}
+			//added by srikanth for additional changes in CR18_16112017-online payment  additional changes ends here
+			
+			//CR06_05042017: csc wallet id validation, start
+				
+			//CR06_05042017: end
+			
+			//CR21_26082015_PHII, below code added to show popup window, start
+			
+			
+			var userCon = confirm('Are you sure you want to save the Submission?');
+			if(!userCon){
+				return;
+			}
+			//CR21_26082015_PHII, end
+            //CR45-Odisha Offline Changes starts here
+			if(payType!=offlineType){
+			
+			
+			}
+			//CR45-Odisha Offline Changes ends here
+		
+			
+			document.frmCrtSub.action = 'SubmissionServlet?rDoAction=SaveSubmission';
+				document.frmCrtSub.pSave.disabled=true;
+				document.frmCrtSub.pBack.disabled=true;
+			document.frmCrtSub.submit();
+			
+		
+
+	}
+	
+}
+
+/* CR23_14122018_CashLimit starts here */
+function isDocVerified(){
+	
+	var pan1 = document.getElementById("pan");
+	var form = document.getElementById("form60");
+	var exemptedPan = document.getElementById("exempted");
+	var firstParty = document.getElementsByName("TextField11")[0].value;
+	var secondParty = document.getElementsByName("TextField18")[0].value;
+	var SDpaidBy = document.getElementsByName("TextField24")[0].value;
+	var maxDiv=document.getElementById("maxDivId").value; 
+	var panCopyCollected = document.getElementById("panCopyCollected").checked;
+	var form60CopyCollected = document.getElementById("form60CopyCollected").checked;
+	var exemptionCopyCollected = document.getElementById("exemptionCopyCollected").checked;
+	var isTINSiteVerified = document.getElementById("yesVerifiedTINSite").checked;
+	var isOriginalVerified = document.getElementById("yesVerifyOriginal").checked;
+	var docVerifyLimit = '0';
+	var submStatus = '';
+	var rejected = 'REJECTED';
+	var baseCertId = '';
+	
+	if(document.getElementById("TextField16Mand")!=null){
+        var firstPAN = document.getElementById("TextField16Mand").value;
+	}
+	else{
+        var firstPAN = document.frmCrtSub.TextField16.value;
+	}
+	if(document.getElementById("TextField23Mand")!=null){
+        var secondPAN = document.getElementById("TextField23Mand").value;
+	}
+	else{
+        var secondPAN = document.frmCrtSub.TextField23.value;
+	}
+    if(document.getElementById("IdentityProofComboMand")!=null){
+        var poi = document.getElementById("IdentityProofComboMand").value;
+	}
+	else{
+        var poi = document.frmCrtSub.IdentityProofCombo.value;
+	}
+    if(document.getElementById("AddressProofComboMand")!=null){
+        var por = document.getElementById("AddressProofComboMand").value;
+	}
+	else{
+        var por = document.frmCrtSub.AddressProofCombo.value;
+	}
+	if(document.getElementById("exemptedReason")!=null){
+		var reasonOfExemption = document.getElementById("exemptedReason").value;
+	}
+	else{
+		var reasonOfExemption = document.frmCrtSub.exemptedReason.value;
+	}
+	
+	var action = '';
+	var AddCertificate = 'AddCertificate';
+	var TRUE = 'TRUE';
+	var rejectedEditable = '';
+	
+	/* if(action == AddCertificate) */
+	if((null != baseCertId && "" != baseCertId) || action == AddCertificate){
+
+		if(document.getElementById("exemptedReasonReadOnly") != null){
+			var reasonOfExemption = document.getElementById("exemptedReasonReadOnly").value;
+		}
+		
+		for(var k=1;k<=maxDiv;k++){
+			var paymentField=document.getElementById("paymentId"+k);
+			if(paymentField != null){
+				var ID=paymentField.value;
+				var instrAmnt = parseInt(document.getElementById("instrAmountStr"+ID).value);
+				var instrType=document.getElementById("instrType"+ID)[document.getElementById("instrType"+ID).selectedIndex].value;
+				if(instrType == "CASH"){
+					var instrAmount = '0';
+					var totalInstrAmount = parseInt(instrAmnt) + parseInt(instrAmount);
+					if((totalInstrAmount > docVerifyLimit)  && (docVerifyLimit != 0)){
+						if((SDpaidBy == firstParty) && (firstPAN !="") && (""!=firstParty)){
+							if(!panCopyCollected){
+							alert("CASH amount is more than Rs  " +docVerifyLimit+ " , please select Pan Card copy collected option.");
+							document.getElementById("panCopyCollected").disabled = false;
+							document.getElementById("yesVerifiedTINSite").disabled = false;
+							document.getElementById("noVerifiedTINSite").disabled = false;
+							document.getElementById("yesVerifyOriginal").disabled = false;
+							document.getElementById("noVerifyOriginal").disabled = false;
+							return false;
+						}if(panCopyCollected && !isTINSiteVerified && !isOriginalVerified){
+							alert("CASH amount is more than Rs " +docVerifyLimit+ " , please verify PAN Card from TIN Site or verify with Original.");
+							document.getElementById("yesVerifiedTINSite").disabled = false;
+							document.getElementById("noVerifiedTINSite").disabled = false;
+							document.getElementById("yesVerifyOriginal").disabled = false;
+							document.getElementById("noVerifyOriginal").disabled = false;
+							return false;
+						}else{
+							document.getElementById("panCopyCollected").disabled = false;
+							document.getElementById("yesVerifiedTINSite").disabled = false;
+							document.getElementById("noVerifiedTINSite").disabled = false;
+							document.getElementById("yesVerifyOriginal").disabled = false;
+							document.getElementById("noVerifyOriginal").disabled = false;
+							return true;
+						}
+						}else if ((SDpaidBy == firstParty) && (("" != poi) || ("" != por))  && (""!=firstParty)){
+							if(!form60CopyCollected){
+								alert("CASH amount is more than Rs " +docVerifyLimit+ " , please select Form 60 copy collected option.");
+								document.getElementById("form60CopyCollected").disabled = false;
+								return false;
+								}
+								else{
+									document.getElementById("form60CopyCollected").disabled = false;
+								return true;}
+							}else if((SDpaidBy == firstParty) && ("" != reasonOfExemption) && (""!=firstParty)){
+								if(!exemptionCopyCollected){
+									alert("CASH amount is more than Rs " +docVerifyLimit+ " , please select Exemption copy collected option.");
+									document.getElementById("exemptionCopyCollected").disabled = false;
+									return false;
+									}
+								else{
+									document.getElementById("exemptionCopyCollected").disabled = false;
+									return true;}
+								}
+						if((SDpaidBy == secondParty) && (secondPAN !="") && (""!=secondParty)){
+							if(!panCopyCollected){
+							alert("CASH amount is more than Rs " +docVerifyLimit+ " , please select Pan Card copy collected option.");
+							document.getElementById("panCopyCollected").disabled = false;
+							document.getElementById("yesVerifiedTINSite").disabled = false;
+							document.getElementById("noVerifiedTINSite").disabled = false;
+							document.getElementById("yesVerifyOriginal").disabled = false;
+							document.getElementById("noVerifyOriginal").disabled = false;
+							return false;
+						}if(panCopyCollected && !isTINSiteVerified && !isOriginalVerified){
+							alert("CASH amount is more than Rs " +docVerifyLimit+ " , please verify PAN Card from TIN Site or verify with Original.");
+							document.getElementById("yesVerifiedTINSite").disabled = false;
+							document.getElementById("noVerifiedTINSite").disabled = false;
+							document.getElementById("yesVerifyOriginal").disabled = false;
+							document.getElementById("noVerifyOriginal").disabled = false;
+							return false;
+						}else{
+							document.getElementById("panCopyCollected").disabled = false;
+							document.getElementById("yesVerifiedTINSite").disabled = false;
+							document.getElementById("noVerifiedTINSite").disabled = false;
+							document.getElementById("yesVerifyOriginal").disabled = false;
+							document.getElementById("noVerifyOriginal").disabled = false;
+							return true;
+						}
+						}else if ((SDpaidBy == secondParty) && (("" != poi) || ("" != por))  && (""!=secondParty)){
+							if(!form60CopyCollected){
+								alert("CASH amount is more than Rs " +docVerifyLimit+ " , please select Form 60 copy collected option.");
+								document.getElementById("form60CopyCollected").disabled = false;
+								return false;
+								}
+								else{
+									document.getElementById("form60CopyCollected").disabled = false;
+									return true;
+								}
+							}else if((SDpaidBy == secondParty) && ("" != reasonOfExemption) && (""!=secondParty)){
+								if(!exemptionCopyCollected){
+									alert("CASH amount is more than Rs " +docVerifyLimit+ " , please select Exemption copy collected option.");
+									document.getElementById("exemptionCopyCollected").disabled = false;
+									return false;
+									}
+								else{
+									document.getElementById("exemptionCopyCollected").disabled = false;
+									return true;}
+								}
+						}else
+							{
+							return true;
+							}
+					}
+				}
+			}
+	}else if(submStatus == rejected  && rejectedEditable != TRUE){
+		var docVerifyCash = '0.0';
+		if(docVerifyCash != 0.0){
+			if((docVerifyCash > docVerifyLimit)  && (docVerifyLimit != 0)){
+				if((SDpaidBy == firstParty) && true == (pan1.checked) && (""!=firstParty)){
+					if(firstPAN !="" && !panCopyCollected){
+					alert("CASH amount is more than Rs  " +docVerifyLimit+ " , please select Pan Card copy collected option.");
+					document.getElementById("panCopyCollected").disabled = false;
+					document.getElementById("yesVerifiedTINSite").disabled = false;
+					document.getElementById("noVerifiedTINSite").disabled = false;
+					document.getElementById("yesVerifyOriginal").disabled = false;
+					document.getElementById("noVerifyOriginal").disabled = false;
+					return false;
+				}if(panCopyCollected && !isTINSiteVerified && !isOriginalVerified){
+					alert("CASH amount is more than Rs " +docVerifyLimit+ " , please verify PAN Card from TIN Site or verify with Original.");
+					document.getElementById("yesVerifiedTINSite").disabled = false;
+					document.getElementById("noVerifiedTINSite").disabled = false;
+					document.getElementById("yesVerifyOriginal").disabled = false;
+					document.getElementById("noVerifyOriginal").disabled = false;
+					return false;
+				}else{
+					document.getElementById("panCopyCollected").disabled = false;
+					document.getElementById("yesVerifiedTINSite").disabled = false;
+					document.getElementById("noVerifiedTINSite").disabled = false;
+					document.getElementById("yesVerifyOriginal").disabled = false;
+					document.getElementById("noVerifyOriginal").disabled = false;
+					return true;}
+				}else if ((SDpaidBy == firstParty) && true == (form.checked) && (""!=firstParty)){
+					if((("" != poi) || ("" != por))  && !form60CopyCollected){
+						alert("CASH amount is more than Rs " +docVerifyLimit+ " , please select Form 60 copy collected option.");
+						document.getElementById("form60CopyCollected").disabled = false;
+						return false;
+						}
+						else{
+							document.getElementById("form60CopyCollected").disabled = false;
+							return true;}
+					}else if((SDpaidBy == firstParty) && true == (exemptedPan.checked) && (""!=firstParty)){
+						if(("" != reasonOfExemption && !exemptionCopyCollected)){
+							alert("CASH amount is more than Rs " +docVerifyLimit+ " , please select Exemption copy collected option.");
+							document.getElementById("exemptionCopyCollected").disabled = false;
+							return false;
+							}
+						else{
+							document.getElementById("exemptionCopyCollected").disabled = false;
+							return true;}
+						}
+				if((SDpaidBy == secondParty) && true == (pan1.checked) && (""!=secondParty)){
+					if(secondPAN !="" && !panCopyCollected){
+					alert("CASH amount is more than Rs " +docVerifyLimit+ " , please select Pan Card copy collected option.");
+					document.getElementById("panCopyCollected").disabled = false;
+					document.getElementById("yesVerifiedTINSite").disabled = false;
+					document.getElementById("noVerifiedTINSite").disabled = false;
+					document.getElementById("yesVerifyOriginal").disabled = false;
+					document.getElementById("noVerifyOriginal").disabled = false;
+					return false;
+				}if(panCopyCollected && !isTINSiteVerified && !isOriginalVerified){
+					alert("CASH amount is more than Rs " +docVerifyLimit+ " , please verify PAN Card from TIN Site or verify with Original.");
+					document.getElementById("yesVerifiedTINSite").disabled = false;
+					document.getElementById("noVerifiedTINSite").disabled = false;
+					document.getElementById("yesVerifyOriginal").disabled = false;
+					document.getElementById("noVerifyOriginal").disabled = false;
+					return false;
+				}else{
+					document.getElementById("panCopyCollected").disabled = false;
+					document.getElementById("yesVerifiedTINSite").disabled = false;
+					document.getElementById("noVerifiedTINSite").disabled = false;
+					document.getElementById("yesVerifyOriginal").disabled = false;
+					document.getElementById("noVerifyOriginal").disabled = false;
+					return true;}
+				}else if ((SDpaidBy == secondParty) && true == (form.checked) && (""!=secondParty)){
+					if((("" != poi) || ("" != por))  && !form60CopyCollected){
+						alert("CASH amount is more than Rs " +docVerifyLimit+ " , please select Form 60 copy collected option.");
+						document.getElementById("form60CopyCollected").disabled = false;
+						return false;
+						}
+						else{
+							document.getElementById("form60CopyCollected").disabled = false;
+							return true;
+						}
+					}else if((SDpaidBy == secondParty) && true == (exemptedPan.checked) && (""!=secondParty)){
+						if(("" != reasonOfExemption && !exemptionCopyCollected)){
+							alert("CASH amount is more than Rs " +docVerifyLimit+ " , please select Exemption copy collected option.");
+							document.getElementById("exemptionCopyCollected").disabled = false;
+							return false;
+							}
+						else{
+							document.getElementById("exemptionCopyCollected").disabled = false;
+							return true;}
+						}
+				}else
+					{
+					return true;
+					}
+		}
+		//added for Bug fix for CR48_AP_Changes
+		else
+		{
+		return true;
+		}
+		//eoa for Bug fix for CR48_AP_Changes
+	}else{
+		for(var k=1;k<=maxDiv;k++){
+			var paymentField=document.getElementById("paymentId"+k);
+			if(paymentField != null){
+				var ID=paymentField.value;
+				var instrAmnt = parseInt(document.getElementById("instrAmountStr"+ID).value);
+				var instrType=document.getElementById("instrType"+ID)[document.getElementById("instrType"+ID).selectedIndex].value;
+				if(instrType == "CASH"){
+					var instrAmount = '0';
+					var totalInstrAmount = parseInt(instrAmnt) + parseInt(instrAmount);
+					if((totalInstrAmount > docVerifyLimit)  && (docVerifyLimit != 0)){
+						if((SDpaidBy == firstParty) && true == (pan1.checked) && (""!=firstParty)){
+							if(firstPAN !="" && !panCopyCollected){
+							alert("CASH amount is more than Rs  " +docVerifyLimit+ " , please select Pan Card copy collected option.");
+							document.getElementById("panCopyCollected").disabled = false;
+							document.getElementById("yesVerifiedTINSite").disabled = false;
+							document.getElementById("noVerifiedTINSite").disabled = false;
+							document.getElementById("yesVerifyOriginal").disabled = false;
+							document.getElementById("noVerifyOriginal").disabled = false;
+							return false;
+						}if(panCopyCollected && !isTINSiteVerified && !isOriginalVerified){
+							alert("CASH amount is more than Rs " +docVerifyLimit+ " , please verify PAN Card from TIN Site or verify with Original.");
+							document.getElementById("yesVerifiedTINSite").disabled = false;
+							document.getElementById("noVerifiedTINSite").disabled = false;
+							document.getElementById("yesVerifyOriginal").disabled = false;
+							document.getElementById("noVerifyOriginal").disabled = false;
+							return false;
+						}else{
+							document.getElementById("panCopyCollected").disabled = false;
+							document.getElementById("yesVerifiedTINSite").disabled = false;
+							document.getElementById("noVerifiedTINSite").disabled = false;
+							document.getElementById("yesVerifyOriginal").disabled = false;
+							document.getElementById("noVerifyOriginal").disabled = false;
+							return true;}
+						}else if ((SDpaidBy == firstParty) && true == (form.checked) && (""!=firstParty)){
+							if((("" != poi) || ("" != por))  && !form60CopyCollected){
+								alert("CASH amount is more than Rs " +docVerifyLimit+ " , please select Form 60 copy collected option.");
+								document.getElementById("form60CopyCollected").disabled = false;
+								return false;
+								}
+								else{
+									document.getElementById("form60CopyCollected").disabled = false;
+									return true;}
+							}else if((SDpaidBy == firstParty) && true == (exemptedPan.checked) && (""!=firstParty)){
+								if(("" != reasonOfExemption && !exemptionCopyCollected)){
+									alert("CASH amount is more than Rs " +docVerifyLimit+ " , please select Exemption copy collected option.");
+									document.getElementById("exemptionCopyCollected").disabled = false;
+									return false;
+									}
+								else{
+									document.getElementById("exemptionCopyCollected").disabled = false;
+									return true;}
+								}
+						if((SDpaidBy == secondParty) && true == (pan1.checked) && (""!=secondParty)){
+							if(secondPAN !="" && !panCopyCollected){
+							alert("CASH amount is more than Rs " +docVerifyLimit+ " , please select Pan Card copy collected option.");
+							document.getElementById("panCopyCollected").disabled = false;
+							document.getElementById("yesVerifiedTINSite").disabled = false;
+							document.getElementById("noVerifiedTINSite").disabled = false;
+							document.getElementById("yesVerifyOriginal").disabled = false;
+							document.getElementById("noVerifyOriginal").disabled = false;
+							return false;
+						}if(panCopyCollected && !isTINSiteVerified && !isOriginalVerified){
+							alert("CASH amount is more than Rs " +docVerifyLimit+ " , please verify PAN Card from TIN Site or verify with Original.");
+							document.getElementById("yesVerifiedTINSite").disabled = false;
+							document.getElementById("noVerifiedTINSite").disabled = false;
+							document.getElementById("yesVerifyOriginal").disabled = false;
+							document.getElementById("noVerifyOriginal").disabled = false;
+							return false;
+						}else{
+							document.getElementById("panCopyCollected").disabled = false;
+							document.getElementById("yesVerifiedTINSite").disabled = false;
+							document.getElementById("noVerifiedTINSite").disabled = false;
+							document.getElementById("yesVerifyOriginal").disabled = false;
+							document.getElementById("noVerifyOriginal").disabled = false;
+							return true;}
+						}else if ((SDpaidBy == secondParty) && true == (form.checked) && (""!=secondParty)){
+							if((("" != poi) || ("" != por))  && !form60CopyCollected){
+								alert("CASH amount is more than Rs " +docVerifyLimit+ " , please select Form 60 copy collected option.");
+								document.getElementById("form60CopyCollected").disabled = false;
+								return false;
+								}
+								else{
+									document.getElementById("form60CopyCollected").disabled = false;
+									return true;}
+							}else if((SDpaidBy == secondParty) && true == (exemptedPan.checked) && (""!=secondParty)){
+								if(("" != reasonOfExemption && !exemptionCopyCollected)){
+									alert("CASH amount is more than Rs " +docVerifyLimit+ " , please select Exemption copy collected option.");
+									document.getElementById("exemptionCopyCollected").disabled = false;
+									return false;
+									}
+								else{
+									document.getElementById("exemptionCopyCollected").disabled = false;
+									return true;}
+								}
+						}else
+							{
+							return true;
+							}
+					}
+				//added for Bug fix for CR48_AP_Changes
+					else
+						{
+							return true;
+						}
+				//eoa for Bug fix for CR48_AP_Changes
+				}
+			}
+	}
+}
+/* CR23_14122018_CashLimit ends here */
+
+
+
+
+
+
+
+
+// Validation Scripts
+//bugFix#22APR2016, below validation method added for address field validation
+function validateAddressField(field)
+{
+        var valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-:/,\\ ";
+        var temp;
+        var ok = "yes";
+        for (var i=0; i<field.value.length; i++){
+                temp = "" + field.value.substring(i, i+1);
+                if (valid.indexOf(temp) == "-1"){
+                        ok = "no";
+						field.value = field.value.substring(0, i);
+                        break;
+                }
+        }
+
+        if (ok == "no") {
+				//alert("Invalid Entry!. Special character ' " + temp + " ' is not allowed.");
+				alert('You have provided an invalid Entry. Special character '+temp+' is not allowed.');
+		   		field.focus();
+				//field.select();
+				return true;
+        } else {
+				return false;
+			}
+}
+
+function removeAll(selectBox) {
+    while (selectBox.options.length > 0) {
+        selectBox.remove(0);
+    }
+}
+//added for CR12_19042022_AP_NewHeads
+function getDDOCode()
+{
+	var distCode=document.getElementById("districtCode").value;
+	var select=document.getElementById("ddoCode");
+	removeAll(select);
+	var opt = document.createElement('option');
+    opt.value = "";
+    opt.innerHTML = "----Select---";
+    select.appendChild(opt);
+    
+	
+	
+}
+//eoa for CR12_19042022_AP_NewHeads
+
+
+function validateAlphaNum(field)
+{
+        var valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-:/ ";
+        var temp;
+        var ok = "yes";
+        for (var i=0; i<field.value.length; i++){
+                temp = "" + field.value.substring(i, i+1);
+                if (valid.indexOf(temp) == "-1"){
+                        ok = "no";
+						field.value = field.value.substring(0, i);
+                        break;
+                }
+        }
+
+        if (ok == "no") {
+				//alert("Invalid Entry!. Special character ' " + temp + " ' is not allowed.");
+				alert('You have provided an invalid Entry. Special character '+temp+' is not allowed.');
+		   		field.focus();
+				//field.select();
+				return true;
+        } else {
+				return false;
+			}
+}
+
+function validateAlphaNumForTXN(field){
+	var valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-";
+    var temp;
+    var ok = "yes";
+    for (var i=0; i<field.value.length; i++){
+            temp = "" + field.value.substring(i, i+1);
+            if (valid.indexOf(temp) == "-1"){
+                    ok = "no";
+					field.value = field.value.substring(0, i);
+                    break;
+            }
+    }
+
+    if (ok == "no") {
+			//alert("Invalid Entry!. Special character ' " + temp + " ' is not allowed.");
+			alert('You have provided an invalid Entry. Special character '+temp+' is not allowed.');
+	   		field.focus();
+			//field.select();
+			return true;
+    } else {
+			return false;
+		}
+}
+
+function validateAlphaNumForGA(field){
+	var valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-/";
+	var challanNo = document.frmCrtSub.TextFieldChallanNo.value;
+	var temp;
+    var ok = "yes";
+    for (var i=0; i<field.value.length; i++){
+            temp = "" + field.value.substring(i, i+1);
+            if (valid.indexOf(temp) == "-1"){
+                    ok = "no";
+					field.value = field.value.substring(0, i);
+                    break;
+            }
+    }
+
+    if (ok == "no") {
+			//alert("Invalid Entry!. Special character ' " + temp + " ' is not allowed.");
+			alert('You have provided an invalid Entry. Special character '+temp+' is not allowed.');
+	   		field.focus();
+			//field.select();
+			return true;
+    }
+}
+
+function validateAlpha(field)
+{
+        var valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
+        //var valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ";
+        var temp;
+        var ok = "yes";
+        for (var i=0; i<field.value.length; i++){
+                temp = "" + field.value.substring(i, i+1);
+                if (valid.indexOf(temp) == "-1"){
+                        ok = "no";
+						field.value = field.value.substring(0, i);
+                        break;
+                }
+        }
+
+        if (ok == "no") {
+				//alert("Invalid Entry!. Special character ' " + temp + " ' is not allowed.");
+				alert('You have provided an invalid Entry. Character '+temp+' is not allowed.');
+		   		field.focus();
+				//field.select();
+				return true;
+        } else {
+				return false;
+			}
+}
+
+function validatePartyname(field){//CR55_05102023_E-VERIFICATION
+	var applicablePartyName = ',NOT APPLICABLE,Not Applicable,NotApplicable,notapplicable,na,NA,not applicable,applicable not,applicable,not,Not,NOT,NOTAPPLICABLE,borrower,Borrower,BORROWER,as per deed,As per deed, As Per Deed,asperdeed,AsPerDeed,ASPERDEED,not available,Not Available,notavailable,NotAvailable,NOT AVAILABLE,NOTAVAILABLE';
+	var firstParty = document.getElementById("TextField11Mand").value;
+	var secondParty = document.getElementById("TextField18Mand").value;
+
+	if(null != applicablePartyName && applicablePartyName.indexOf(firstParty)>0){
+		alert('Please enter ACTUAL NAME. Note that entering generic names like borrower/ NA / Not applicable/ Not Available as per list attached etc. will make this eStamp invalid.');
+			return false;
+	}
+	if(null != applicablePartyName &&  applicablePartyName.indexOf(secondParty)>0){
+		alert('Please enter ACTUAL NAME. Note that entering generic names like borrower/ NA / Not applicable/ Not Available as per list attached etc. will make this eStamp invalid.');
+			return false;
+	}
+} 
+
+function validateTextarea(field)
+{
+    var valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,?:;!@#$()+*-/ ";
+    var temp;
+    var ok = "yes";
+    for (var i = 0; i < field.value.length; i++) {
+        temp = "" + field.value.substring(i, i + 1);
+        if (valid.indexOf(temp) == "-1") {
+            ok = "no";
+            field.value = field.value.substring(0, i);
+            break;
+        }
+    }
+
+    if (ok == "no") {
+        //alert("Invalid Entry!. Special character ' " + temp + " ' is not allowed.");
+        alert('You have provided an invalid Entry. Special character ' + temp + ' is not allowed.');
+        field.focus();
+        //field.select();
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function replaceEnterKey(textarea,replaceWith)
+{
+    textarea.value = escape(textarea.value)
+    for (i = 0; i < textarea.value.length; i++) {
+        if (textarea.value.indexOf("%0D%0A") > -1) {
+            textarea.value = textarea.value.replace("%0D%0A", replaceWith)
+        } else if (textarea.value.indexOf("%0A") > -1) {
+            textarea.value = textarea.value.replace("%0A", replaceWith)
+        } else if (textarea.value.indexOf("%0D") > -1) {
+            textarea.value = textarea.value.replace("%0D", replaceWith)
+        }
+    }
+    textarea.value = unescape(textarea.value)
+}
+	
+function odiyaCharCheck(field)
+{
+	var valid = "^[^%'\&\"<=>\\\\^_`{|}\\[\\]~]^";
+        var temp;
+        var ok = "yes";
+        for (var i=0; i<field.value.length; i++){
+                temp = "" + field.value.substring(i, i+1);
+                if (valid.indexOf(temp) == "-1"){
+                        ok = "yes";
+				}else{
+					 ok = "no";
+				field.value = field.value.substring(0, i);
+                        break;
+				}
+                
+        }
+
+        if (ok == "no") {
+				alert('Special Characters Not Allowed ');
+		   		field.focus();
+				return true;
+        } else {
+				return false;
+			}
+	
+	}
+
+function allowOnlyNumeric()
+{
+        var enteredkeyCode = event.keyCode;
+        if((enteredkeyCode>=48 && enteredkeyCode<=57)||(enteredkeyCode==46)){
+                var oldValue = event.srcElement.value;
+                if(oldValue.indexOf(".")!=-1)
+                {
+                        if(enteredkeyCode==46)
+                        {
+                                event.keyCode=0;
+                        }
+                }
+        }
+        else{
+                //window.status = "Please type numeric data";
+				//alert("Please type numeric data");
+				alert('Please type numeric data.');
+                event.keyCode=0;
+        }
+}
+// CR07_02052014_Validation in property description 
+function allowOnlyNumber(field){
+	 var valid = "0123456789";
+     var temp;
+     var ok = "yes";
+     for (var i=0; i<field.value.length; i++){
+         temp = "" + field.value.substring(i, i+1);
+         if (valid.indexOf(temp) == "-1"){
+             ok = "no";
+			 field.value = field.value.substring(0, i);
+             break;
+         }
+     }
+
+     if (ok == "no") {
+		alert('Please type numeric data. ');
+		field.focus();
+ 		return true;
+     } 
+     else {
+		return false;
+	}
+}
+
+function checknumber(obj)
+{
+	var x=obj.value
+	if(x != null && x != "")
+	{
+		var anum="";
+		if(x.indexOf(".")!=-1 && x.indexOf(".")!=0 )
+			anum=/(^\d+$)|(^\d+\.\d+$)/
+		else if(x.indexOf(".")==0 )
+		{
+			x = "0" + x;
+			//alert(x);
+			anum=/(^\d+$)|(^\d+\.\d+$)/
+		}
+		else
+			anum=/(^\d+$)/
+
+		if (anum.test(x))
+			return false;
+		else
+		{
+			//alert("Please input a valid number!");
+			alert('Please type numeric data.');
+			obj.focus();
+			obj.value ="";
+			return true;
+		}
+	}
+
+}
+
+<!-- CR05_27032017 Starts -->
+/* Changes have been made for CR09_31052017_Cashlimit-Statewise */
+function cashInstrLimit(){
+	var maxDiv=document.getElementById("maxDivId").value;
+	var cashInstrLimit = '0';
+	var cashLimitMessage = convertCashLimitToWords1(document.getElementById('cashInstrLimitMessage'));
+
+	var paymentF; 
+	var Id;
+	for(var i = 1; i <=maxDiv; i++ ){
+		paymentF=document.getElementById("paymentId"+i);
+		if(paymentF != null){
+			Id=paymentF.value;
+			/* var amountBeingUtilized = document.getElementById("instrAmountStr"+Id); */
+			var instAmount=parseInt(document.getElementById("instrAmountStr"+Id).value);
+			
+			var instType =  document.getElementById("instrType"+Id)[document.getElementById("instrType"+Id).selectedIndex].value;
+			/* if((instType=='CASH') && ("Y"==cashLimitEnabled)) */
+			if((instType=='CASH') && (cashInstrLimit != 0)){
+				if(instAmount > cashInstrLimit){
+					alert('Cash payment more than '+cashLimitMessage+
+					' is not allowed. ');
+					document.getElementById("instrAmountStr"+Id).focus();
+					return false;
+			}
+			}
+	}
+	}
+}
+
+/* CR05_27032017 Ends */
+
+
+//CR16_06072015 - 10-digit mobile no. - start
+function checkLength(obj) {	
+	var fullnumber = obj.value;
+	var intPart;
+	if(fullnumber.length > 0) {
+		if(fullnumber.indexOf(".") == -1){
+		 intPart = fullnumber.substring(0,fullnumber.length)
+		} else {
+		 alert('Enter valid 10-digit Mobile No');
+		 obj.focus();
+		 obj.value = "";
+		 return true;
+		}
+		
+		if(intPart.length < 10) {
+			 alert('Enter valid 10-digit Mobile No');
+			 obj.focus();
+			 return true;
+		}
+	}
+}
+//CR16_06072015 - end
+function isBlank(objControl)
+{
+		var result = false;
+        if(objControl.value=="" || objControl.value==null || objControl.value==" ")
+        {
+                result = true;
+				//alert("Mandatory Field Can't be empty;")
+				alert('Please enter all the mandatory data.');
+				objControl.focus();
+        }
+
+        return result;
+} // end of isBlank
+
+//CR16_06072015 - email validation function
+function checkEmail(obj) {
+
+   var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+				
+   if(obj.value.length > 0) {
+	    if (!filter.test(obj.value)) {
+		    alert('Please provide a valid email address');
+		    obj.focus();
+		    return true;
+	 	}
+	    return false;
+   }
+}//CR16_06072015 - end
+    
+function chkInvalidDate(fld) {
+		//if(!fnIsBlank(fld.value)) {
+		if(fld.value!="" ||fld.value!=null) {
+			var theString = new String(fld.value);
+			var delimiterCharacter="-";
+			var ok = true;
+			var frmt = true;
+			var leap = false;
+			var isMonth = false;
+			monthArr = new Array ("JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC");
+			dateArr = new Array (31,28,31,30,31,30,31,31,30,31,30,31);
+			dateLeapArr = new Array (31,29,31,30,31,30,31,31,30,31,30,31);
+
+			if (theString.length != 11){
+				frmt = false;
+			} else {
+				if (theString.charAt(2) != "-" && theString.charAt(6) != "-") {
+					frmt = false;
+				} else {
+					var tokens = theString.split(delimiterCharacter);
+					if (tokens.length!=3) {
+						frmt = false;
+					} else {
+						var date = tokens[0];
+						var month = tokens[1].toUpperCase();
+						var year = tokens[2];
+						if (isNaN(year) || isNaN(date)) {
+							ok = false;
+						} else {
+							if (year%4==0) {
+								if (year%100==0) {
+									if (year%400==0)
+										leap=true;
+								} else {
+									leap = true;
+								}
+							}
+							for (var i=0; i<12; i++) {
+								if (month==monthArr[i]) {
+									if (leap) {
+										if (date>dateLeapArr[i])
+											ok = false;
+									} else {
+										if (date>dateArr[i])
+											ok = false;
+									}
+									isMonth = true;
+									break;
+								}
+							}
+							if (!isMonth)
+								ok = false;
+						}
+					}
+				}
+			}
+			if (!ok) {
+				//alert("Please enter valid Date.");
+				alert('Please enter valid Date.');
+				fld.value = "";
+				//fld.focus();
+				return true;
+			}
+			if (!frmt) {
+				//alert("Please enter the date in DD-MTH-YYYY format.");
+				alert('Please enter the date in DD-MMM-YYYY format.');
+				fld.value = "";
+				//fld.focus();
+				return true;
+			}
+		}
+	 } // end of chkInvalidDate
+
+function makeInteger(obj)
+{
+	var vName = obj.value;	
+	//alert(vName);
+	if(vName != null)
+	{
+		var vLength = vName.length;		
+		for(var i=0 ; i< vLength ; i++)
+		{
+			var vChar = vName.charAt(i);			
+			if(vChar == ".")
+			{				
+				alert('Please enter integer only.');
+				vName = vName.substring(0,i);
+				obj.value = vName;
+				break;
+			}			
+		}
+	}
+}
+
+function checkForDecimalPlaces(obj)
+{
+	if("" != trimAll(obj.value))
+	{
+		if(parseFloat(obj.value) <= 999999999999999.00)
+		{
+			obj.value = roundNumber(obj.value, 0, true);
+		}
+		else
+		{
+			var val = obj.value;
+			val = val.substring(0, 15);   
+			obj.value = val;
+			alert('The value is too large to be accepted. \nResetting the value length to maximum permitted length of [15] digits'+'\n['+val+']');
+		}
+	}
+}
+
+function checkForDecimalAndAppendDblZero(obj)
+{
+	if(parseFloat(obj.value) < 999999999999999.00)
+	{
+        obj.value = roundNumber(obj.value, 2, true);
+    }
+	else
+	{
+		var val = obj.value;
+	 	val = val.substring(0, 15);   
+	 	obj.value = val;
+		alert('The value is too large to be accepted. \nResetting the value length to maximum permitted length of [15] digits'+'\n['+val+']');
+	}
+	appendDblZero(obj);
+}
+
+function roundNumber(num, ndec, addz)
+{
+     if (num != "")
+     {
+          var factor = Math.pow(10, ndec);
+
+          num = Math.round(num * factor);
+          num = num / factor;
+          if (addz)
+          {
+               var dot = ("" + num).indexOf(".");
+               if (dot>=0)
+               {
+                    var nzeros = dot + ndec + 1 - ("" + num).length;
+                    for (i=0; i< nzeros; i++)
+                    {
+                         num = num + "0";
+                    }
+               }
+               else
+               {
+                    num = num + ".";
+                    for (i=0; i< ndec; i++)
+                    {
+                         num = num + "0";
+                    }
+               }
+          }
+     }
+     return (num);
+}
+//Bug18970- Added event in method
+function textCounter(field,maxlimit,event) {
+     	   if (field.value.length+1 > maxlimit) // if too long...trim it!
+     	   {
+     	   //alert("Maximum 120 characters are allowed in Remark Field..");
+		   alert('Maximum [' + maxlimit + '] characters are allowed in this Field.');
+		   event.keyCode=0;
+     	   field.value = field.value.substring(0, maxlimit);		   
+     	   field.focus();
+     	   //field.select();
+     	   return false;
+     	   }
+     	   else return true;
+     	   // otherwise, update 'characters left' counter
+
+     	   }
+
+function testIsValidObject(objToTest){
+	if (null == objToTest) {
+		return false;
+	}
+	if ("undefined" == typeof(objToTest) ) {
+		return false;
+	}
+	return true;
+}
+
+//ADDED FOR CR45_Odisha_Requirement_Offline
+  function doRoundUpWithoutDecimal(field)
+   { 
+	   var val = field.value;
+	   while(val.indexOf(",") >= 0)
+	   {
+	   	val = val.replace(",","");
+   	   }
+	   
+	   var result=Math.ceil(val* 100) / 100 ;
+	   field.value = result;
+  }
+  
+  
+function checkForDecimalPlacesAddtnlHead(obj)
+{
+	if("" != trimAll(obj.value))
+	{
+		if(parseFloat(obj.value) > 999999999999999.00)
+		{
+			var val = obj.value;
+			val = val.substring(0, 15);   
+			obj.value = val;
+			alert('The value is too large to be accepted. \nResetting the value length to maximum permitted length of [15] digits'+'\n['+val+']');
+		}
+		else
+			{
+			var val = obj.value;
+			val = val.substring(0, 15);   
+			
+			val=Math.ceil(val * 100) / 100 
+			
+			obj.value = val;
+			}
+	}
+}
+
+function validateAlphaNumAddtnlHead(field)
+{
+        var valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-:/ ";
+        var temp;
+        var ok = "yes";
+        for (var i=0; i<field.value.length; i++){
+                temp = "" + field.value.substring(i, i+1);
+                if (valid.indexOf(temp) == "-1"){
+                        ok = "no";
+						field.value = field.value.substring(0, i);
+                        break;
+                }
+        }
+
+        if (ok == "no") {
+				//alert("Invalid Entry!. Special character ' " + temp + " ' is not allowed.");
+				alert('You have provided an invalid Entry. Special character '+temp+' is not allowed.');
+		   		field.focus();
+				//field.select();
+				return true;
+        } else {
+				return false;
+			}
+}
+//EOA FOR CR45_Odisha_Requirement_Offline 
+
+
+
+</script>
+
+<script>
+/* 
+* CR02_16022016_PANFORM60_Mandatory
+* VALIDATION -- Starts here
+* CR03_13032017_PANEXEMPTED - below functions has been modified as per requirement for PAN exemption
+*/
+function panform60man(obj){
+	
+	if((obj.value) > 200000){
+		panform60Mandatory();
+}
+}
+
+function panform60Mandatory()
+{
+	if((document.getElementById("IdentityProofComboMand")) && (document.getElementById("AddressProofComboMand")) && document.getElementById("exemptedReason")){
+
+	var pan1 = document.getElementById("pan");
+	var form = document.getElementById("form60");
+	var exemptedPan = document.getElementById("exempted"); /* CR_PANEXEMPTED */
+	var payment = "";
+	var ereg = "R";
+	if(ereg==payment){
+	var firstParty = document.getElementsByName("TextField24")[0].value;
+	}else{
+	var firstParty = document.getElementsByName("TextField11")[0].value;
+	}
+	var secondParty = document.getElementsByName("TextField18")[0].value;
+	var SDpaidBy = document.getElementsByName("TextField24")[0].value;
+	
+	/* CR23_14122018_CashLimit starts here */
+	if(true == (pan1.checked)){
+		document.getElementById('form60CopyCollectedTR').style.display = 'none';
+		document.getElementById('exemptionCopyCollectedTR').style.display = 'none';
+		document.getElementById('panCopyCollectedTR').style.display = 'table-row';
+		document.getElementById('verifyOriginalTR').style.display = 'table-row';
+		document.getElementById('verifyTINSiteTR').style.display = 'table-row';
+		document.getElementById('panVerifyFlag').style.display = 'table-row';
+	}
+	else if(true == (form.checked)){
+		document.getElementById('panCopyCollectedTR').style.display = 'none';
+		document.getElementById('exemptionCopyCollectedTR').style.display = 'none';
+		document.getElementById('form60CopyCollectedTR').style.display = 'table-row';
+		document.getElementById('verifyOriginalTR').style.display = 'none';
+		document.getElementById('verifyTINSiteTR').style.display = 'none';
+		document.getElementById('panVerifyFlag').style.display = 'none';
+	}
+	else if(true == (exemptedPan.checked)){
+		document.getElementById('form60CopyCollectedTR').style.display = 'none';
+		document.getElementById('panCopyCollectedTR').style.display = 'none';
+		document.getElementById('exemptionCopyCollectedTR').style.display = 'table-row';
+		document.getElementById('verifyOriginalTR').style.display = 'none';
+		document.getElementById('verifyTINSiteTR').style.display = 'none';
+		document.getElementById('panVerifyFlag').style.display = 'none';
+	}
+	/* CR23_14122018_CashLimit ends here */
+	
+	if(document.getElementById("TextField16Mand")!=null){
+        var firstPAN = document.getElementById("TextField16Mand").value;
+	}
+	else{
+        var firstPAN = document.frmCrtSub.TextField16.value;
+	}
+	if(document.getElementById("TextField23Mand")!=null){
+        var secondPAN = document.getElementById("TextField23Mand").value;
+	}
+	else{
+        var secondPAN = document.frmCrtSub.TextField23.value;
+	}
+    if(document.getElementById("IdentityProofComboMand")!=null){
+        var poi = document.getElementById("IdentityProofComboMand").value;
+	}
+	else{
+        var poi = document.frmCrtSub.IdentityProofCombo.value;
+	}
+    if(document.getElementById("AddressProofComboMand")!=null){
+        var por = document.getElementById("AddressProofComboMand").value;
+	}
+	else{
+        var por = document.frmCrtSub.AddressProofCombo.value;
+	}
+	if(document.getElementById("exemptedReason")!=null){
+		var reasonOfExemption = document.getElementById("exemptedReason").value;
+	}
+	else{
+		var reasonOfExemption = document.frmCrtSub.exemptedReason.value;
+	}
+	
+	
+	if((SDpaidBy == firstParty) && true == (pan1.checked) && (""!=firstParty)){
+		if(firstPAN ==""){
+		alert("Please Enter First Party's PAN");
+		document.getElementById("TextField16Mand").disabled = false;
+	    document.getElementById("TextField23Mand").disabled = false;
+		document.getElementById("TextField16Mand").focus();
+		document.getElementById("IdentityProofComboMand").disabled = true;
+		document.getElementById("AddressProofComboMand").disabled = true;
+		document.getElementById("exemptedReason").disabled = true;
+		return false;
+		}
+		else
+			return true;
+	}
+	else if ((SDpaidBy == firstParty) && true == (form.checked) && (""!=firstParty)){
+		if(("" == poi) || ("" == por)){ //bug fixes along with Software Testing Case #103771 || added instead of &&
+		alert("Please Select First Party's Proof of Identity and Proof of Residence");
+		document.getElementById("exemptedReason").disabled = true;
+		return false;
+		}
+		else
+		return true;
+	}
+	else if((SDpaidBy == secondParty) && true == (pan1.checked) && (""!=secondParty)){
+		if(secondPAN == ""){
+		alert("Please Enter Second Party's PAN");
+		document.getElementById("TextField16Mand").disabled = false;
+	    document.getElementById("TextField23Mand").disabled = false;
+		document.getElementById("TextField23Mand").focus();
+		document.getElementById("IdentityProofComboMand").disabled = true;
+		document.getElementById("AddressProofComboMand").disabled = true;
+		document.getElementById("exemptedReason").disabled = true;
+		return false;
+		}
+		else
+		return true;
+	}
+	else if((SDpaidBy == secondParty) && true == (form.checked) && (""!=secondParty)){
+		if(("" == poi) || ("" == por)){ 
+		alert("Please Select Second Party's Proof of Identity and Proof of Residence");
+		document.getElementById("exemptedReason").disabled = true;
+		return false;
+		}
+		else
+		return true;
+	}
+	else if(((SDpaidBy == "") || (SDpaidBy !=firstParty) || (SDpaidBy !=secondParty)) && true == (form.checked)){
+		alert("Please Select Stamp Duty Amount Payer's Proof of Identity and Proof of Residence");
+		document.getElementById("exemptedReason").disabled = true;
+		return false;
+	}
+	else if(((SDpaidBy == "") || (SDpaidBy !=firstParty) || (SDpaidBy !=secondParty)) && true == (pan1.checked)){
+		alert("Please Enter Stamp Duty Amount Payer's PAN");
+		document.getElementById("IdentityProofComboMand").disabled = true;
+		document.getElementById("AddressProofComboMand").disabled = true;
+		document.getElementById("exemptedReason").disabled = true;
+		document.getElementById("TextField16Mand").disabled = false;
+	    document.getElementById("TextField23Mand").disabled = false;	
+		
+		return false;
+	}
+	else if(true == (exemptedPan.checked)){
+		if("" == reasonOfExemption){
+			alert("Please select the reason of exemption");
+			document.getElementById("IdentityProofComboMand").disabled = true;
+			document.getElementById("AddressProofComboMand").disabled = true;
+			document.getElementById("TextField16Mand").disabled = true;
+			document.getElementById("TextField23Mand").disabled = true;
+			document.getElementById("exemptedReason").disabled = false;
+			return false;
+		}
+		else if("Non-Residents" == reasonOfExemption && "" == document.getElementById("passportNumber").value){
+				alert("Please enter passport number of stamp duty payer");
+				document.getElementById("passportNumber").focus();
+				return false;
+			}
+		else{
+			return true;
+		}
+		}
+	return false;
+	}
+}
+</script>
+<script>
+ function preSelectedPANForm60(){
+	 
+		var pan1 = document.getElementById("pan");
+		var form = document.getElementById("form60");
+		var exemptedPan = document.getElementById("exempted"); /* CR_PANEXEMPTED */
+		if(document.getElementById("TextField16Mand")!=null){
+	        var firstPAN = document.getElementById("TextField16Mand").value;
+		}
+		else{
+	        var firstPAN = document.frmCrtSub.TextField16.value;
+		}
+		if(document.getElementById("TextField23Mand")!=null){
+	        var secondPAN = document.getElementById("TextField23Mand").value;
+		}
+		else{
+	        var secondPAN = document.frmCrtSub.TextField23.value;
+		}
+	    if(document.getElementById("IdentityProofComboMand")!=null){
+	        var poi = document.getElementById("IdentityProofComboMand").value;
+		}
+		else{
+	        var poi = document.frmCrtSub.IdentityProofCombo.value;
+		}
+	    if(document.getElementById("AddressProofComboMand")!=null){
+	        var por = document.getElementById("AddressProofComboMand").value;
+		}
+		else{
+	        var por = document.frmCrtSub.AddressProofCombo.value;
+		}
+		if(document.getElementById("exemptedReason") != null){
+			var reasonOfExemption = document.getElementById("exemptedReason").value;
+	    }
+	    else{
+			//var reasonOfExemption = document.getElementById("exemptedReason").value; Commented and added below for 358540
+            var reasonOfExemption = document.getElementsByName("exemptedReason").value;
+	    }
+
+		
+		if(firstPAN != "" || secondPAN != ""){
+			pan1.checked=true;
+			form.checked=false;
+			exemptedPan.checked = false;
+			document.getElementById("TextField16Mand").disabled = false;
+		    document.getElementById("TextField23Mand").disabled = false;
+			document.getElementById("IdentityProofComboMand").disabled = true;
+			document.getElementById("AddressProofComboMand").disabled = true;
+			document.getElementById("exemptedReason").disabled = true;
+			document.getElementById("passportNumber").disabled = true;
+		}
+		else if(poi != "" || por != ""){
+			form.checked=true;
+			pan1.checked=false;
+			exemptedPan.checked = false;
+			document.getElementById("IdentityProofComboMand").disabled = false;
+			document.getElementById("AddressProofComboMand").disabled = false;
+			document.getElementById("TextField16Mand").disabled = true;
+		    document.getElementById("TextField23Mand").disabled = true;
+			document.getElementById("exemptedReason").disabled = true;
+			document.getElementById("passportNumber").disabled = true;
+		}
+		else if("" == firstPAN && "" == secondPAN && "" == poi && "" == por && ""!= reasonOfExemption
+				&& typeof reasonOfExemption !== 'undefined'){
+			exemptedPan.checked = true;
+			pan1.checked=false;
+			form.checked=false;
+			document.getElementById("IdentityProofComboMand").disabled = true;
+			document.getElementById("AddressProofComboMand").disabled = true;
+			document.getElementById("TextField16Mand").disabled = true;
+		    document.getElementById("TextField23Mand").disabled = true;
+		    document.getElementById("exemptedReason").disabled = false;
+		    if("Non-Residents" == reasonOfExemption){
+		    	document.getElementById("passportNumber").disabled = false;
+			}		
+		}
+	}
+	
+</script>
+<script>
+function checkMeFirst(){
+	if((document.getElementById("IdentityProofComboMand")) && (document.getElementById("AddressProofComboMand")) && (document.getElementById("exemptedReason"))
+			&& (document.getElementById("pan")) && (document.getElementById("form60"))){
+			preSelectedPANForm60();
+			
+	}
+	preSelectedDocVerified();
+}
+window.onload = checkMeFirst;
+</script>
+<script>
+
+function panFormSelect(){
+	
+	if((document.getElementById("IdentityProofComboMand")) && (document.getElementById("AddressProofComboMand")) && (document.getElementById("exemptedReason"))){
+		
+	var pan1 = document.getElementById("pan");
+	var form = document.getElementById("form60");
+	var exemptedPan = document.getElementById("exempted"); /* CR_PANEXEMPTED */
+	var firstParty = document.getElementsByName("TextField11")[0].value;
+	var secondParty = document.getElementsByName("TextField18")[0].value;
+	var SDpaidBy = document.getElementsByName("TextField24")[0].value;
+	
+	if(document.getElementById("TextField16Mand")!=null){
+        var firstPAN = document.getElementById("TextField16Mand").value;
+	}
+	else{
+        var firstPAN = document.frmCrtSub.TextField16.value;
+	}
+	if(document.getElementById("TextField23Mand")!=null){
+        var secondPAN = document.getElementById("TextField23Mand").value;
+	}
+	else{
+        var secondPAN = document.frmCrtSub.TextField23.value;
+	}
+    if(document.getElementById("IdentityProofComboMand")!=null){
+        var poi = document.getElementById("IdentityProofComboMand").value;
+	}
+	else{
+        var poi = document.frmCrtSub.IdentityProofCombo.value;
+	}
+    if(document.getElementById("AddressProofComboMand")!=null){
+        var por = document.getElementById("AddressProofComboMand").value;
+	}
+	else{
+        var por = document.frmCrtSub.AddressProofCombo.value;
+	}
+	
+	if(document.getElementById("exemptedReason") != null){
+	    var reasonOfExemption = document.getElementById("exemptedReason").value;
+	 }
+	 else{
+	    var reasonOfExemption = document.frmCrtSub.exemptedReason.value;
+	 }
+	
+	if(form.checked==true){
+		document.getElementById("TextField16Mand").value ="";
+		document.getElementById("TextField23Mand").value ="";
+		document.getElementById("exemptedReason").value = "";
+		document.getElementById("passportNumber").value = "";
+		document.getElementById("IdentityProofComboMand").disabled = false;
+		document.getElementById("AddressProofComboMand").disabled = false;
+		document.getElementById("TextField16Mand").disabled = true;
+		document.getElementById("TextField23Mand").disabled = true;
+		document.getElementById("passportNumber").disabled = true;
+	 }
+	 else if(pan1.checked == true){
+		document.getElementById("IdentityProofComboMand").value = "";
+		document.getElementById("AddressProofComboMand").value = "";
+		document.getElementById("exemptedReason").value = "";
+		document.getElementById("passportNumber").value = "";
+		document.getElementById("IdentityProofComboMand").disabled = true;
+		document.getElementById("AddressProofComboMand").disabled = true;
+		document.getElementById("TextField16Mand").disabled = false;
+		document.getElementById("TextField23Mand").disabled = false;
+		document.getElementById("passportNumber").disabled = true;
+		
+		if(SDpaidBy == firstParty){
+			document.getElementById("TextField16Mand").focus();
+			}
+		else if(SDpaidBy == secondParty){
+			document.getElementById("TextField23Mand").focus();
+			}
+ 	}
+	
+	else if(exemptedPan.checked == true){
+		document.getElementById("IdentityProofComboMand").value = "";
+		document.getElementById("AddressProofComboMand").value = "";
+		document.getElementById("TextField16Mand").value ="";
+		document.getElementById("TextField23Mand").value ="";
+		document.getElementById("IdentityProofComboMand").disabled = true;
+		document.getElementById("AddressProofComboMand").disabled = true;
+		document.getElementById("TextField16Mand").disabled = true;
+		document.getElementById("TextField23Mand").disabled = true;
+		document.getElementById("exemptedReason").disabled = false;
+	}
+ }
+}
+ 
+
+/* CR23_14122018_CashLimit starts here */
+function preSelectedDocVerified(){
+	
+var YES="Yes";
+var pan1 = document.getElementById("pan");
+var form = document.getElementById("form60");
+var exemptedPan = document.getElementById("exempted");
+var isTINSiteVerified = document.getElementById("yesVerifiedTINSite").checked;
+var isOriginalVerified = document.getElementById("yesVerifyOriginal").checked;
+var action = '';
+var AddCertificate = 'AddCertificate';
+
+if(action == AddCertificate){
+	if(document.getElementById("TextField16Mand")!=null){
+	    var firstPAN = document.getElementById("TextField16Mand").value;
+	}
+	else{
+	    var firstPAN = document.frmCrtSub.TextField16.value;
+	}
+	if(document.getElementById("TextField23Mand")!=null){
+	    var secondPAN = document.getElementById("TextField23Mand").value;
+	}
+	else{
+	    var secondPAN = document.frmCrtSub.TextField23.value;
+	}
+	if(document.getElementById("IdentityProofComboMand")!=null){
+	    var poi = document.getElementById("IdentityProofComboMand").value;
+	}
+	else{
+	    var poi = document.frmCrtSub.IdentityProofCombo.value;
+	}
+	if(document.getElementById("AddressProofComboMand")!=null){
+	    var por = document.getElementById("AddressProofComboMand").value;
+	}
+	else{
+	    var por = document.frmCrtSub.AddressProofCombo.value;
+	}
+	if(document.getElementById("exemptedReason") != null){
+		var reasonOfExemption = document.getElementById("exemptedReason").value;
+	}
+	else{
+		var reasonOfExemption = document.frmCrtSub.exemptedReason.value;
+	}
+	
+	if(document.getElementById("exemptedReasonReadOnly") != null){
+		var reasonOfExemption = document.getElementById("exemptedReasonReadOnly").value;
+	}
+	
+	if(firstPAN != "" || secondPAN != ""){
+		document.getElementById("form60CopyCollectedTR").style.display = 'none';
+		document.getElementById("exemptionCopyCollectedTR").style.display = 'none';
+		document.getElementById("panCopyCollectedTR").style.display = 'table-row';
+		document.getElementById("verifyOriginalTR").style.display = 'table-row';
+		document.getElementById("verifyTINSiteTR").style.display = 'table-row';
+		document.getElementById("panVerifyFlag").style.display = 'table-row';
+		document.getElementById("panCopyCollected").disabled = false;
+		document.getElementById("yesVerifiedTINSite").disabled = false;
+		document.getElementById("noVerifiedTINSite").disabled = false;
+		document.getElementById("yesVerifyOriginal").disabled = false;
+		document.getElementById("noVerifyOriginal").disabled = false;
+		if(YES == ""){
+			document.getElementById("panCopyCollected").checked = true;
+			document.getElementById("panCopyCollected").disabled = true;}
+		if(YES == ""){
+			document.getElementById("yesVerifiedTINSite").checked = true;
+			document.getElementById("yesVerifiedTINSite").disabled = true;
+			document.getElementById("noVerifiedTINSite").disabled = true;
+			document.getElementById("yesVerifyOriginal").disabled = true;
+			document.getElementById("noVerifyOriginal").disabled = true;}
+		if(YES == ""){
+			document.getElementById("yesVerifyOriginal").checked = true;
+			document.getElementById("yesVerifyOriginal").disabled = true;
+			document.getElementById("noVerifyOriginal").disabled = true;
+			document.getElementById("yesVerifiedTINSite").disabled = true;
+			document.getElementById("noVerifiedTINSite").disabled = true;}
+	}
+	else if(poi != "" || por != ""){
+		document.getElementById("panCopyCollectedTR").style.display = 'none';
+		document.getElementById("exemptionCopyCollectedTR").style.display = 'none';
+		document.getElementById("form60CopyCollectedTR").style.display = 'table-row';
+		document.getElementById("verifyOriginalTR").style.display = 'none';
+		document.getElementById("verifyTINSiteTR").style.display = 'none';
+		document.getElementById("panVerifyFlag").style.display = 'none';
+		document.getElementById("form60CopyCollected").disabled = false;
+		document.getElementById("panCopyCollected").disabled = true;
+		document.getElementById("yesVerifiedTINSite").disabled = true;
+		document.getElementById("noVerifiedTINSite").disabled = true;
+		document.getElementById("yesVerifyOriginal").disabled = true;
+		document.getElementById("noVerifyOriginal").disabled = true;
+		if(YES == ""){
+			document.getElementById("form60CopyCollected").checked = true;
+			document.getElementById("form60CopyCollected").disabled = true;}
+	}
+	else if("" == firstPAN && "" == secondPAN && "" == poi && "" == por && ""!= reasonOfExemption){
+		document.getElementById("panCopyCollectedTR").style.display = 'none';
+		document.getElementById("form60CopyCollectedTR").style.display = 'none';
+		document.getElementById("exemptionCopyCollectedTR").style.display = 'table-row';
+		document.getElementById("verifyOriginalTR").style.display = 'none';
+		document.getElementById("verifyTINSiteTR").style.display = 'none';
+		document.getElementById("panVerifyFlag").style.display = 'none';
+		document.getElementById("exemptionCopyCollected").disabled = false;
+		document.getElementById("panCopyCollected").disabled = true;
+		document.getElementById("yesVerifiedTINSite").disabled = true;
+		document.getElementById("noVerifiedTINSite").disabled = true;
+		document.getElementById("yesVerifyOriginal").disabled = true;
+		document.getElementById("noVerifyOriginal").disabled = true;
+		if(YES == ""){
+			document.getElementById("exemptionCopyCollected").checked = true;
+			document.getElementById("exemptionCopyCollected").disabled = true;}
+	}
+	 
+}else{
+
+/* */
+	if(YES == ""){
+	document.getElementById("form60CopyCollectedTR").style.display = 'none';
+	document.getElementById("exemptionCopyCollectedTR").style.display = 'none';
+	document.getElementById("panCopyCollectedTR").style.display = 'table-row';
+	document.getElementById("verifyOriginalTR").style.display = 'table-row';
+	document.getElementById("verifyTINSiteTR").style.display = 'table-row';
+	document.getElementById("panVerifyFlag").style.display = 'table-row';
+	document.getElementById("panCopyCollected").disabled = false;
+	document.getElementById("panCopyCollected").checked = true;
+	document.getElementById("yesVerifiedTINSite").disabled = true;
+	document.getElementById("noVerifiedTINSite").disabled = true;
+	document.getElementById("yesVerifyOriginal").disabled = true;
+	document.getElementById("noVerifyOriginal").disabled = true;
+	
+	
+	if(YES == "")
+		{
+		document.getElementById("yesVerifiedTINSite").disabled = false;
+		document.getElementById("noVerifiedTINSite").disabled = false;
+		document.getElementById("yesVerifyOriginal").disabled = false;
+		document.getElementById("noVerifyOriginal").disabled = false;
+		document.getElementById("yesVerifiedTINSite").checked = true;
+	}
+	if(YES == "")
+	{
+		document.getElementById("yesVerifiedTINSite").disabled = false;
+		document.getElementById("noVerifiedTINSite").disabled = false;
+		document.getElementById("yesVerifyOriginal").disabled = false;
+		document.getElementById("noVerifyOriginal").disabled = false;
+		document.getElementById("yesVerifyOriginal").checked = true;
+	}
+	
+	if(pan1 == null){
+		document.getElementById("panCopyCollected").disabled = true;
+		document.getElementById("yesVerifiedTINSite").disabled = true;
+		document.getElementById("noVerifiedTINSite").disabled = true;
+		document.getElementById("yesVerifyOriginal").disabled = true;
+		document.getElementById("noVerifyOriginal").disabled = true;
+	}
+}
+/*  */
+if(YES == ""){
+	document.getElementById("panCopyCollectedTR").style.display = 'none';
+	document.getElementById("exemptionCopyCollectedTR").style.display = 'none';
+	document.getElementById("form60CopyCollectedTR").style.display = 'table-row';
+	document.getElementById("verifyOriginalTR").style.display = 'none';
+	document.getElementById("verifyTINSiteTR").style.display = 'none';
+	document.getElementById("panVerifyFlag").style.display = 'none';
+	document.getElementById("form60CopyCollected").disabled = false;
+	document.getElementById("panCopyCollected").disabled = true;
+	document.getElementById("yesVerifiedTINSite").disabled = true;
+	document.getElementById("noVerifiedTINSite").disabled = true;
+	document.getElementById("yesVerifyOriginal").disabled = true;
+	document.getElementById("noVerifyOriginal").disabled = true;
+	document.getElementById("form60CopyCollected").checked = true;
+	
+	
+	if(form == null){
+		document.getElementById("form60CopyCollected").disabled = true;
+	}
+}
+	/* if(exemptedPan.checked == true) */
+		if(YES == ""){
+	document.getElementById("form60CopyCollectedTR").style.display = 'none';
+	document.getElementById("panCopyCollectedTR").style.display = 'none';
+	document.getElementById("exemptionCopyCollectedTR").style.display = 'table-row';
+	document.getElementById("verifyOriginalTR").style.display = 'none';
+	document.getElementById("verifyTINSiteTR").style.display = 'none';
+	document.getElementById("panVerifyFlag").style.display = 'none';
+	document.getElementById("exemptionCopyCollected").disabled = false;
+	document.getElementById("panCopyCollected").disabled = true;
+	document.getElementById("yesVerifiedTINSite").disabled = true;
+	document.getElementById("noVerifiedTINSite").disabled = true;
+	document.getElementById("yesVerifyOriginal").disabled = true;
+	document.getElementById("noVerifyOriginal").disabled = true;
+	document.getElementById("exemptionCopyCollected").checked = true;
+	
+	if(exemptedPan == null){
+		document.getElementById("exemptionCopyCollected").disabled = true;
+	}
+} 
+}
+
+}
+/* CR23_14122018_CashLimit starts here */
+
+</script>
+
+<script>
+function validatePAN(obj){
+    
+	if((document.getElementById("TextField16Mand")) && 	(document.getElementById("TextField23Mand"))){
+		
+	document.getElementById("TextField16Mand").style.textTransform = "uppercase";
+	document.getElementById("TextField23Mand").style.textTransform = "uppercase"; 
+	var firstPAN = document.getElementById("TextField16Mand").value;
+    var secondPAN = document.getElementById("TextField23Mand").value;
+	var panValidationRegex = /^([A-Za-z]{3})+([CPHFATBLJGcphfatbljg]{1})+([A-Za-z]{1})+([0-9]{4})+([A-Za-z]{1})+$/;
+	if(!panValidationRegex.test(obj.value) && 0 < (obj.value.length)){
+		alert("Please enter a valid PAN");
+		obj.focus();
+		return true;
+	}
+	}
+}
+// CR02_16022016_PANFORM60_Mandatory VALIDATION -- Ends here;
+/* CR21_01122017_BiharAadhaar starts*/
+function validateAadhaar(obj){
+	
+	var aadhaarvalidateRegex = /^([0-9]{12})+$/;
+	
+	if(!aadhaarvalidateRegex.test(obj.value) && 0 < (obj.value.length)){
+		alert("Please enter a valid Aadhaar Number");
+		obj.value = "";
+		obj.focus();
+		return true;
+	}
+	
+}
+/* CR21_01122017_BiharAadhaar ends */
+</script>
+
+<!-- CR03_13032017_PANEXEMPTED starts-->
+<script>
+function passportRequired(obj){
+	if(document.getElementById("passportNumber")!=null){
+        var passportNum = document.getElementById("passportNumber");
+	}
+	else{
+        var passportNum = document.frmCrtSub.passportNumber;
+	}
+	if(document.getElementById("exemptedReason") != null){
+	    var reasonOfExemption = document.getElementById("exemptedReason");
+	 }
+	 else{
+	    var reasonOfExemption = document.frmCrtSub.exemptedReason;
+	 }
+	 if("Central Government" == reasonOfExemption.value || "State Government" == reasonOfExemption.value || "Consulate" == reasonOfExemption.value){
+	 alert("Please collect necessary exemption order");
+	 document.getElementById("passportNumber").value = "";
+	 document.getElementById("passportNumber").disabled = true;
+	 }
+	if("Non-Residents" == reasonOfExemption.value){
+		alert("Please enter passport number of stamp duty payer");
+		document.getElementById("passportNumber").disabled = false;
+		document.getElementById("passportNumber").style.textTransform = "uppercase";
+		passportNum.focus();
+		return false;
+	 }
+}
+</script>
+
+<!-- CR03_13032017_PANEXEMPTED ends-->
+	<script>
+
+
+/* CR02_16022016_PAN, below function added to update pand details, start */ 
+function updatePANdetails(){
+	//CR02_1602016_PANFORM60_Mandatory starts
+	var firstPAN = document.getElementById("TextField16Mand").value;
+	var secondPAN = document.getElementById("TextField23Mand").value;
+	if(firstPAN.length > 0) {
+		if(validatePAN(document.getElementById("TextField16Mand"))) {
+			document.getElementById("TextField16Mand").focus();
+			return false;
+		}
+	}
+	if(secondPAN.length > 0){
+		 if(validatePAN(document.getElementById("TextField23Mand"))) {
+			document.getElementById("TextField23Mand").focus();
+			return false;
+		}
+	}
+	var SDamount = document.frmCrtSub.TextField28.value;
+	var poi = document.getElementById("IdentityProofComboMand").value;
+	var por = document.getElementById("AddressProofComboMand").value;
+	
+	if(SDamount > 200000){
+		if(firstPAN=="" || secondPAN=="" || (poi=="" && por=="")){
+			var p = panform60Mandatory();
+			if(p==false){
+				return false;
+			}
+	}
+}	
+	//CR02_1602016_PANFORM60_Mandatory Ends
+	var userCon = confirm('Are you sure you want to save the Submission?');
+	if(!userCon){
+		return;
+	}	
+	document.frmCrtSub.action = 'SubmissionServlet?rDoAction=SaveSubmission';
+	document.frmCrtSub.pUpdate.disabled=true;
+	document.frmCrtSub.pBack.disabled=true;
+	document.frmCrtSub.submit();
+	
+}
+/* CR02_16022016_PAN, end */
+
+//CR08_25072016_integrationwithCSC, below function added for wallet payment button
+function payFromCscWallet(){			
+	document.frmCrtSub.action = 'https://wallet.csccloud.in/v1/payment/null';			
+	document.frmCrtSub.pDelete.disabled=true;
+	document.frmCrtSub.pBack.disabled=true;
+	document.frmCrtSub.pPrevSubm.disabled=true;
+	document.frmCrtSub.submit();
+}
+//CR06_05042017: below function added to check csc wallet id
+
+//SREI
+function payFromSreiWallet(){			
+	document.frmCrtSub.action = 'http://uat.sahajretail.co.in/web/guest/estamping_thirdparty_skash';			
+	document.frmCrtSub.pDelete.disabled=true;
+	document.frmCrtSub.pBack.disabled=true;	
+	document.frmCrtSub.method = "post";
+	document.frmCrtSub.submit();
+}
+//SREI
+
+function checkCscWalletId(){
+	var cscWalletId = document.getElementById("cscWalletId").value;
+	var cscWalletIdObj = document.getElementById("cscWalletId");
+	if(cscWalletId!="" && cscWalletId.length > 0 && cscWalletId.length==12){
+		if(allowOnlyNumber(cscWalletIdObj)) {			
+			cscWalletIdObj.focus();
+			return false;
+		}		
+	}
+	else{
+		alert("Please enter 12 digit valid csc wallet id.");
+		cscWalletIdObj.focus();
+		return false;
+	}
+	return true;
+}
+//SREI
+function checkSreiWalletId(){
+	var sreiWalletId = document.getElementById("sreiWalletId").value;
+	var sreiWalletIdObj = document.getElementById("sreiWalletId");
+	if(sreiWalletId!="" && sreiWalletId.length > 0 && sreiWalletId.length==16){
+		if(allowOnlyNumber(sreiWalletIdObj)) {			
+			sreiWalletIdObj.focus();
+			return false;
+		}		
+	}
+	else{
+		//CR04_11012024_Task_379224
+		alert("Please enter 16 digit valid SAHAJ wallet id.");
+		sreiWalletIdObj.focus();
+		return false;
+	}
+	return true;
+}
+
+</script>
+
+</td></tr></tbody></table>
+
+
+		
+
+								
+            				
+            			
+            			
+							&nbsp;
+							&nbsp;
+						
+						
+							&nbsp;
+						
+					
+				
+			
+			
+				&nbsp;
+			
+		
+	
+</body></html>

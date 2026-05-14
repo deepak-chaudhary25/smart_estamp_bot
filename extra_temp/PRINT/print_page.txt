@@ -1,0 +1,1266 @@
+<html><head>
+
+<!-- Software Testing Case #91885, commented below code -->
+<!-- <script language="JavaScript" type="text/JavaScript">history.forward();</script> -->
+
+<title>India e-Stamping System</title>
+<!--<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">-->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Cache-control" content="no-cache">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="-1">
+
+
+
+
+
+
+
+
+<script type="text/javascript" src="/trade/esi/html/js/popcalendar.js"></script></head><body onload="doShowHide();initDynamicOptionLists();noBack();" onkeypress="return disableCtrlModifer(event);" onkeydown="return disableCtrlModifer(event);" onpageshow="if(event.persisted)noBack();" onunload="" style="cursor: auto;"><div onclick="bShow=true" id="pccalendar" style="z-index:+999;position:absolute;visibility:hidden;filter:progid:DXImageTransform.Microsoft.Shadow(color='#aaaaaa',Direction=135,Strength=2)"><table style="width:220px;font:11px Arial;border:1px solid #000000;background:#fff"><tbody><tr bgcolor="#933C06"><td><table width="100%"><tbody><tr><td style="padding:2px;font:bold 11px Arial;color:#fff"><span id="pccaption"><span style="border:1px solid #ffffff;cursor:pointer" onmouseover="swapImage('pcchangeLeft','left2.gif');this.style.borderColor='#DBAC58';window.status='undefined'" onclick="decMonth()" onmouseout="clearInterval(intervalID1);swapImage('pcchangeLeft','left1.gif');this.style.borderColor='#ffffff';window.status=''" onmousedown="clearTimeout(timeoutID1);timeoutID1=setTimeout('StartDecMonth()',500)" onmouseup="clearTimeout(timeoutID1);clearInterval(intervalID1)">&nbsp;<img id="pcchangeLeft" src="/trade/esi/images/gfx/left1.gif" width="10" height="11" border="0">&nbsp;</span>&nbsp;<span id="pcspanMonth" style="border:1px solid #ffffff;cursor:pointer" onmouseover="swapImage('pcchangeMonth','drop2.gif');this.style.borderColor='#DBAC58';window.status='undefined'" onmouseout="swapImage('pcchangeMonth','drop1.gif');this.style.borderColor='#ffffff';window.status=''" onclick="popUpMonth()"></span>&nbsp;<span style="border:1px solid #ffffff;cursor:pointer" onmouseover="swapImage('pcchangeRight','right2.gif');this.style.borderColor='#DBAC58';window.status='undefined'" onmouseout="clearInterval(intervalID1);swapImage('pcchangeRight','right1.gif');this.style.borderColor='#ffffff';window.status=''" onclick="incMonth()" onmousedown="clearTimeout(timeoutID1);timeoutID1=setTimeout('StartIncMonth()',500)" onmouseup="clearTimeout(timeoutID1);clearInterval(intervalID1)">&nbsp;<img id="pcchangeRight" src="/trade/esi/images/gfx/right1.gif" width="10" height="11" border="0">&nbsp;</span>&nbsp;&nbsp;&nbsp;<span id="pcspanYear" style="border:1px solid #ffffff;cursor:pointer" onmouseover="swapImage('pcchangeYear','drop2.gif');this.style.borderColor='#DBAC58';window.status='undefined'" onmouseout="swapImage('pcchangeYear','drop1.gif');this.style.borderColor='#ffffff';window.status=''" onclick="popUpYear()"></span>&nbsp;</span></td><td align="right" valign="middle"><a href="javascript:hideCalendar()"><img src="/trade/esi/images/gfx/close2.gif" width="18" height="17" border="0"></a></td></tr></tbody></table></td></tr><tr><td style="padding:5px;background:#FFF2DB"><span id="pccontent"></span></td></tr></tbody></table></div><div id="pcselectMonth" style="z-index:+999;position:absolute;visibility:hidden;"></div><div id="pcselectYear" style="z-index:+999;position:absolute;visibility:hidden;"></div>
+<script type="text/javascript" src="/trade/esi/html/js/commonvalidation.js"></script>
+<script type="text/javascript" src="/trade/esi/html/js/dynamicoptionlist.js"></script>
+
+ <!-- Issue 214042: VA/PT audit observations -->
+
+<script type="text/javascript" src="/trade/esi/html/js/jquery-3.7.1.min.js"></script> <!-- Issue 442357: VA/PT audit observations -->
+
+<!-- CR46_04072018_ new JS file added -->
+<script type="text/javascript" src="/trade/esi/html/js/ReportsValidate.js"></script>
+
+
+<!-- Software Testing Case #91885, added noBack() function, to stop browser back button -->
+<script type="text/javascript">
+function noBack(){	
+	window.history.forward();
+}
+</script>
+
+
+<link href="/trade/esi/css/newstyle.css" rel="stylesheet" type="text/css">
+<link href="/trade/esi/css/govt.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}
+
+.style1 {
+	color: #FFFFFF
+}
+</style>
+
+
+<script type="text/javascript">
+var TheNewWindow = null;
+
+function doShowHide()
+{
+	if(document.accDispForm != null && document.accDispForm.paymMode != null)
+	{
+		var showVals = 'CHEQUE, DD';
+		var val = document.accDispForm.paymMode.value;
+		if(showVals.indexOf(val) >= 0)
+		{
+			HM_f_ToggleElementList(true,['hideDDNo', 'hideDDNoLabel'],'id');	
+		}
+		else
+		{
+			HM_f_ToggleElementList(false,['hideDDNo', 'hideDDNoLabel'],'id');	
+		}
+	}
+}
+
+var termsWindow_width="500", termsWindow_height="300";
+var termsWindow_left =(screen.width/2) - termsWindow_width/2;
+var termsWindow_top = (screen.height/2) - termsWindow_height/2;
+var styleStr_termsWindow ='toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=yes,width='+termsWindow_width+',height='+termsWindow_height+',left='+termsWindow_left+',top='+termsWindow_top+',screenX='+termsWindow_left+',screenY='+termsWindow_top;
+var termsWindowHandler = null;
+function openPopUpTerms(url)
+{
+   if(termsWindowHandler != null)
+   {
+	   termsWindowHandler.close();
+   }
+   termsWindowHandler = window.open(url,"termsWindow", styleStr_termsWindow);     
+   if (!termsWindowHandler.opener)
+   {
+		termsWindowHandler.opener = self;
+   }
+}
+</script>
+<script language="JavaScript">
+
+var message="";
+
+function clickIE() {if (document.all) {(message);return false;}}
+function clickNS(e) {if 
+(document.layers||(document.getElementById&&!document.all)) {
+if (e.which==2||e.which==3) {(message);return false;}}}
+if (document.layers) 
+{document.captureEvents(Event.MOUSEDOWN);document.onmousedown=clickNS;}
+else{document.onmouseup=clickNS;document.oncontextmenu=clickIE;}
+
+document.oncontextmenu=new Function("return false")
+
+
+function disableCtrlModifer(evt)
+{
+var disabled = {n:0};
+var ctrlMod = (window.event)? window.event.ctrlKey : evt.ctrlKey;
+var key = (window.event)? window.event.keyCode : evt.which;
+key = String.fromCharCode(key).toLowerCase();
+return (ctrlMod && (key in disabled))? false : true;
+} 
+
+// CR17_07022023_IGRDashboards Starts  
+function openAnalystics(){
+	
+	var win=null;
+	win= window.open("/eStampIndia/dashBoard/DashBoardServlet?rDoAction=DashboardIGR", "Analytics", "toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=1,resizable=1,height=400,width=550,addressbar=no");
+	if (win.outerWidth < screen.availWidth || win.outerHeight < screen.availHeight)
+	  {
+		win.moveTo(0,0);
+		win.resizeTo(screen.availWidth, screen.availHeight);
+	  }
+    win.focus();
+}
+
+// CR17_07022023_IGRDashboards Ends
+
+</script>
+<!-- Support #79972 - START -->
+<script>
+    $(function() {
+
+        $('.link2').click(function(e) {
+            if ($('.link2').hasClass('disabled'))
+            {                    	
+            	alert('E-Stamp printing is in progress.');
+                e.preventDefault();
+                return false;
+            } else {
+                //alert('I am Enabled Now');
+            }
+        });
+
+    });
+</script>
+<!-- Support #79972 - END -->
+
+<!-- Software Testing Case #91885, noBack() added, onpageshow and onunload events also added -->
+
+
+<form name="invalidwindow" id="invalidwindow" action="/eStampIndia/useradmin/UserAdminMainServlet?rDoAction=DisplayMultiTabErrorPage" method="post"></form>
+<script language="JavaScript" type="text/JavaScript">
+<!--CR08_25072016_integrationwithCSC, below code added to explicity set the window name-->
+
+	if(window.name == '' || window.name != 'eStamp'){ 
+		invokeInvalidBrowserWindow(); 
+	} 
+	
+	function invokeInvalidBrowserWindow(){ 
+		//location.replace("/eStampIndia/esi/ESITabError.jsp")
+		document.invalidwindow.submit(); 
+	}
+</script>
+
+<!-- Support #93580:SHCIL application audit findings- 2015 - START -->
+
+<script language="Javascript">
+var secs
+var timerID = null
+var timerRunning = false
+var delay = 1000
+//var popupMsg = '';
+
+function InitializeTimer()
+{
+    // Set the length of the timer, in seconds
+    secs ='600'
+    StopTheClock()
+    StartTheTimer()
+}
+
+
+
+function StopTheClock()
+{
+    if(timerRunning)
+        clearTimeout(timerID)
+    timerRunning = false
+}
+
+function getFormatedCurrentDate()
+{
+var m_names = new Array(
+"Jan","Feb","Mar","Apr",
+"May","Jun","Jul","Aug",
+"Sep","Oct","Nov","Dec"
+);
+
+var time = new Date();
+
+time.setMinutes(time.getMinutes()+1);
+
+var inthour = time.getHours();
+var intmin  = time.getMinutes();
+if(inthour <10){
+	inthour = "0"+inthour;
+}
+if(intmin <10){
+	intmin = "0"+intmin;
+}
+
+
+return m_names[time.getMonth()]+' '+time.getDate()+','+time.getFullYear()+' '+inthour+':'+intmin;
+
+}
+
+
+function getCookie(name){
+	  var cname = name + "=";
+	  var dc = document.cookie;
+	 
+	  if (dc.length > 0) {
+	    begin = dc.indexOf(cname);
+	  
+	    if (begin != -1) {
+	      begin += cname.length;
+	      end = dc.indexOf(";", begin);
+	
+	      if (end == -1) end = dc.length;
+	      
+		return unescape(dc.substring(begin, end));
+	    }
+	  }
+	  return null;
+}
+
+function getCurrentTime() {
+
+	  var curtime = new Date();
+	  var curhour = curtime.getHours();
+	  var curmin = curtime.getMinutes();
+	  var cursec = curtime.getSeconds();
+
+	  var inseconds = curtime*60+curhour*60+curmin*60+cursec;
+
+
+	  return inseconds;
+}
+        
+function StartTheTimer() {
+       if (secs == '60')
+       {
+       		var cookievalue = getCookie('AlertTime');
+       		if(cookievalue != null){
+       			if(getCurrentTime() >= cookievalue)
+       			{
+       				popupMsg = 'This session will expire at '+' '+getFormatedCurrentDate()+' '+' Do you Want To Extend the session ?';
+
+   				}else{
+	   				secs=cookievalue-getCurrentTime();
+	   				secs = secs - 1
+	   				timerRunning = true
+	   				timerID = self.setTimeout("StartTheTimer()", delay)
+	   			}
+
+   		   }
+   		   else{
+   			popupMsg = 'This session will expire at '+' '+getFormatedCurrentDate()+' '+' Do you Want To Extend the session ?';
+
+   		}
+
+   		var isClose = confirm(popupMsg);		
+
+   		if(isClose == true)
+   		{
+
+   			buttonClick = "OK";
+   			document.cookie = "AlertTime" + "=" + escape (getCurrentTime()+600);
+    			window.open('/eStampIndia/esi/EsiSessionExtend.jsp','newwindow','scrollbars=yes,top=100,left=200,width=650,height=350');
+
+   			secs='600'
+   			secs = secs - 1
+   			timerRunning = true
+   			timerID = self.setTimeout("StartTheTimer()", delay)
+   		}
+   		else if(isClose == false){
+   			//logout1("../ana/LogoutServlet");//Code added if user choose "Cancel", then logout from the application. 23062015
+   		}
+
+   	}
+    else
+    {
+        secs = secs - 1
+        timerRunning = true
+        timerID = self.setTimeout("StartTheTimer()", delay)
+    }
+
+        // end pop up code
+}
+
+</script>
+
+<script language="Javascript">
+
+	InitializeTimer();
+
+</script>
+<!-- Support #93580:SHCIL application audit findings- 2015 - END -->
+
+
+				&nbsp;
+			<table width="100%" border="0" cellpadding="0" cellspacing="0">
+	<tbody><tr>
+		<td align="center" valign="top">
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			<tbody><tr>
+				<td width="40%" align="right" valign="bottom"><img src="/trade/esi/images/logo.gif" width="318" height="43"></td>
+				<td width="60%" align="center" valign="top">
+				<table width="100%" height="43" border="0" cellpadding="0" cellspacing="0">
+					<tbody><tr>
+						<td width="98%" align="right" valign="middle" background="/trade/esi/images/bg_toplinks.gif" class="lnk-sort-again">
+							<a href="/eStampIndia/useradmin/UserAdminLoginServlet?rDoAction=HomePage" class="link2 disabled">Home</a> <span class="style1">|</span>
+							<a href="/eStampIndia/useradmin/UserAdminMainServlet?rDoAction=ChangePwd" class="link2 disabled">My Account</a> <span class="style1">|</span> <a href="/eStampIndia/useradmin/UserAdminMainServlet?rDoAction=Logout" class="link2 disabled">Logout</a></td>
+						<td width="2%" align="right" valign="middle" background="/trade/esi/images/bg_toplinks.gif" class="lnk-sort-again">&nbsp;</td>
+					</tr>
+				</tbody></table>
+				</td>
+			</tr>
+		</tbody></table>
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			<tbody><tr>
+				<td align="left" valign="top" background="/trade/esi/images/bg_subpageheader.jpg"><img src="/trade/esi/images/header_subpage2.jpg" width="385" height="95"></td>
+			</tr>
+		</tbody></table>
+		
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			<tbody><tr>
+				<td width="195" align="left" valign="top">
+				<table width="195" border="0" cellspacing="0" cellpadding="0">
+					<tbody><tr align="left" valign="middle">
+						<td height="31" colspan="1" class="lnk-menu">
+						<div align="left"><font size="1" color="#333333"> <b>Welcome,<br>
+						 NAVAL   &nbsp;KISHORE   &nbsp;MISHRA  &nbsp;[upnavmisu001]</b>
+						</font></div>
+						</td>
+						<td>&nbsp;&nbsp;&nbsp;</td>
+					</tr>
+					<!-- CR08_15042020_Indivudual user ID for CRAS - starts here -->
+					
+					<!-- CR08_15042020_Indivudual user ID for CRAS - ends here -->
+					<!-- CR21_26082015 - Display User Last Login Details - START -->
+					<tr>
+					     <td colspan="1" class="lnk-menu" height="31" style="background-color: #d69432"> 
+							<div align="left"><font color="#ffffff" size="1"> 
+								<b>Last Login :<br> 13-05-2026 02:27:14 PM</b>
+							</font></div>
+						</td>
+					</tr>
+					<!-- CR21_26082015 - Display User Last Login Details - END -->
+					<tr>
+						<td>
+						<table width="100%" border="0" cellspacing="0" cellpadding="0">
+							<tbody><tr>
+								<td></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/submission/SubmissionServlet?rDoAction=LoadStampDuty" class="link2 disabled">Create Submission</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/cert/certgen/CertGenServlet?sDoAction=DraftDetail&amp;aAction=EditSubmission" class="link2 disabled">Edit Submission</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/cert/certgen/CertGenServlet?sDoAction=DraftDetail&amp;aAction=GenerateCertificate" class="link2 disabled">Generate Certificate</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/cert/certsearch/CertSearchServlet?rDoAction=LoadSearchAddnlCert" class="link2 disabled">Additional Stamp Duty</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/useradmin/UserAdminMainServlet?rDoAction=GetImpBal" class="link2 disabled">ACC Own Imprest Balance</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/cert/certsearch/CertSearchServlet?rDoAction=LoadSearchCert" class="link2 disabled">Search Certificate</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/cert/certutil/CertUtilVerifyServlet?rDoAction=VerifyCert" class="link2 disabled">Verify Certificate</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/submission/SubmissionServlet?rDoAction=SEARCHBYUNIDOCID" class="link2 disabled">Search Submission</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/report/ReportServlet?pReportAction=pShowMgtRptMainPage" class="link2 disabled">Reports</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/useradmin/UserAdminMainServlet?rDoAction=GetEcollDetails" class="link2 disabled">Credits Received</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr><tr align="left" valign="middle" background="/trade/esi/images/bg_sidelinks.gif"><td width="166" height="31" background="/trade/esi/images/bg_sidelinks.gif" class="lnk-menu"><a href="/eStampIndia/submission/SubmissionServlet?rDoAction=LoadSearchSubmForPAN" class="link2 disabled">Update Missing PAN/Form 60</a></td><td width="18" height="31"><img src="/trade/esi/images/icon.gif" width="12" height="13"></td></tr>
+							
+						</tbody></table>
+						</td>
+						<td>&nbsp;&nbsp;&nbsp;</td>
+					</tr>
+				</tbody></table>
+				</td>
+				<td width="100%" align="left" valign="top">
+				
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/trade/esi/css/main.css">
+		
+		<script type="text/javascript" src="/trade/esi/html/js/nifty.js"></script>
+		
+		 <!-- Issue 214042: VA/PT audit observations -->
+		
+		<script type="text/javascript" src="/trade/esi/html/js/jquery-3.7.1.min.js"></script> <!-- Issue 442357: VA/PT audit observations -->
+		<script type="text/javascript" src="/trade/esi/html/js/jquery-ajaxTransport-XDomainRequest-1.0.4.min.js"></script>
+		<script type="text/javascript" src="/trade/esi/html/js/json2.min.js"></script>
+		<script type="text/javascript" src="/trade/esi/html/js/printService_v3.js"></script> <!-- Bug 413106: Print option disabled after PCP upgrade (New printService.js file) -->
+		<!-- Bug 439361: Increase in Open sockets when encryption is enabled in LIVE - Vishnu -->
+<script>
+var b;
+function closeIt()
+{
+	if(b)
+	event.returnValue = "You are attempting to close the window! \nIf you close this window before the print has completed, \nyou wont be able to print the original certificate again!";
+}
+</script>
+
+<!-- Support #79972 - START -->
+<script>
+
+
+
+
+
+function reloadImg(id) {
+	 
+	if(id == 'cap')
+	{
+	   var obj1 = document.getElementById(id);
+	
+	   var obj2 = document.getElementById('cap');
+
+	}
+	if(id == 'cap1')
+			{
+				var obj1 = document.getElementById('cap');
+			   var obj2 = document.getElementById(id);
+			}	
+			
+	 var src1 = obj1.src;
+	
+	 var src2 = obj2.src;
+	 var pos1 = src1.indexOf('?');
+	 var pos2 = src2.indexOf('?');
+	   
+	   if (pos1 >= 0) {
+	      src1 = src1.substr(0, pos1);
+	   }
+	   if (pos2 >= 0) {
+		      src2 = src2.substr(0, pos2);
+		   }
+		
+	   var date = new Date();
+	   obj1.src = src1 + '?v=' + date.getTime()+'&action=ajax';
+	   obj2.src = src2 + '?v=' + date.getTime()+'&action=ajax';
+		
+	   return false;
+	} 
+
+
+</script>
+
+
+        <script type="text/javascript">
+            window.onload=function(){
+			if(!NiftyCheck())
+				return;
+			Rounded("div#header","transparent","#C01A18","medium");
+			Rounded("div#footer","transparent","#C01A18","small");
+			RoundedTop("div.menu","#FFF","#C01A18");
+	        RoundedBottom("div.menu","#FFF","#EFFBFF");
+	        RoundedTop("div#fix","#fff","#fff","small");
+            }
+    
+            var hashChangeCounter=0;
+            var isPageLoaded = false;
+
+            //Back Button fix
+            if (typeof history.pushState === "function") {
+              history.pushState(null, null, location.href);
+              window.addEventListener('popstate', function(event) {
+                     history.pushState(null, null, location.href);
+                     if(isPageLoaded){
+                           alert('Do not click browser BACK or REFRESH buttons as this may end your transaction.\nPlease use the provided navigation buttons within the page during your transaction.');
+                     }
+              });
+            } else {
+              location.hash = "pageLoad";
+              hashChangeCounter = 1;
+              $(window).on('hashchange', function() {
+                     if(hashChangeCounter > 2 && location.hash == "#backPageLoad"){
+                           alert('Do not click browser BACK or REFRESH buttons as this may end your transaction.\nPlease use the provided navigation buttons within the page during your transaction.');
+                     }
+                     window.history.forward(0);
+                     hashChangeCounter++;
+                     location.hash = "backPageLoad";
+              });
+            }
+
+            $(window).load(function () {
+               setTimeout(function () { isPageLoaded = true; }, 1000);
+            });
+
+        </script>
+
+	<script type="text/javascript">
+            // utility function to get parameter values from url
+            $.urlParam = function (name) { var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href); if (results == null) { return null; } else { return decodeURIComponent(results[1]) || null; }  }
+
+            var appStatusPollIntervalMs = 2000;
+            var hasLaunchedApp = false;
+            var pollForAppStatus = true;
+            var isAppRunning = false;
+            var fileNameList = ["IN-UP60058937510453Y.ps"];
+            var pFilename = fileNameList[0],
+			pURL = "https://www.shcilestamp.com:443/eStampIndia/PrintControlServlet",
+            pSessionKey = "JSESSIONID",
+            pSessionValue = "fZIgnl3-jwIFQNmJnrd-OzegErnVI2xKHvRjdzXgj6J4mNgdWrTg!-1370270634!NONE!1778663710206",
+            pPrintControlVersion =  $.urlParam('pPrintControlVersion'),
+            fileName=fileNameList[0],
+            printControlBaseUrl = "https://127.0.0.1:50000/",
+            pCustom="mac,pdoctimeout-300000"; //CR21_20022024_Capturing Printer Model and provide link to update Brother printer firmware
+            
+          //PCP_Upgrade - Vishnu
+          //Bug 439361: Increase in Open sockets when encryption is enabled in LIVE - Vishnu
+          pAlias = "ESI_NEWPROD",   
+          pVerifyString = "aHR0cHM6Ly9zaGNpbGVzdGFtcC5jb20vZVN0YW1wSW5kaWEvc3VibWlzc2lvbi9TdWJtaXNzaW9uU2VydmxldHxTblRxVmNSTWY1aHhUR1NpOGxaODJsUUcxclhPVVFjZVgzalE5Yk9hOGNwcWtMN25hblB5NlVjbG5Wa3c4WUhUZGdTRWlpdkdlVTRVc0J3TlpNR2grRUtmQzZQb2M2M1BhZVAvbTdjNGZrVUhKWEJiaEZ3YXdMaDBWS092Mnk1WDNyVVlYeEVlMFNIdGNSaGR0SXNhVnhvS3l3UHJTQk9PaS9hV0dBcFphNFFtV2dQciswdUdZSXNkN2ZOSmx3bTFsMVY1SFowdnRrMUZmL016aUJ3NmJ4MWt4b1M3WkFXd05xK3NIRW9DS3Joc2x1Vjk4andqZFg1U2xCZmJqY1dNWS9BRFcwT3MwSWU5QjJWWmdmVklCaTViVWRTZVU4OFlqYTdrYnJpU1lnUGNWS2E2U3gvRjQ5bkh4RC9Famt0dkRTM1BrQ21QQTg5Q0I0cXV4Slpkamc9PQ==";
+          //PCP_Upgrade - Vishnu
+
+            var infoParams = { 
+					custom: "mac", 
+					userenv: "ESI_KIOSKUSER",
+					sysenv: "ESI_KIOSKUSER"
+				};
+            
+        </script>
+
+
+
+        <script type="text/javascript">
+			var timer;
+			//added by srikanth to find out the version installed in client machine from logs--starts here
+			var installedVersion;
+			var showPrintButton="N";
+			//added by srikanth to find out the version installed in client machine from logs--ends here
+			// preload images
+            function preload(arrayOfImages) {
+                $(arrayOfImages).each(function(){
+                    (new Image()).src = this;
+                });
+            }
+			
+            // queries the print service for printers and renders the JSON result
+            // refresh - boolean flag indicating whether print control should query the printers again or fetch from cache
+            function queryPrinters(refresh) {
+                PrintService.ajaxQueryPrinters(refresh, false).done(function (printerList) {
+
+                    var printerListComboBox = PrintServiceUtil.renderPrinterListComboBox(printerList);
+                    $('#printerListContainer').html(printerListComboBox);
+					$('#printBtn').show();
+					//$('#instructions').hide();
+					//$('#multiPrintBtn').show();
+                    $('#refreshBtn').show();
+					$('#jobStatus').show();
+					$('#downloadBtn').show();
+					$('#infoBtn').show();
+					$('#checkBtn').show(); //CR21_20022024_Capturing Printer Model and provide link to update Brother printer firmware
+
+                    if(printerList.length <= 0){
+                    	alert('Print Control: Could not find any compatable printers.');
+                    	$('#printOptions :input').prop("disabled", true);
+                    } else {
+                    	var dropdownIndex = $("#printerListContainer")[0].selectedIndex;
+                    	if(dropdownIndex != 0){
+                    	var selectedPrinter = $('#printerListContainer :selected').text();
+                    	var pfirmWareCheck = "";
+                    	if(null!=pfirmWareCheck && "Y"==pfirmWareCheck){
+                    		if (null!=currentInstalledPCPVersion && ("1.5.3.0"!=currentInstalledPCPVersion && "1.5.3.1"!=currentInstalledPCPVersion)){
+                    			document.getElementById("firmware").style.display = 'block';
+                        		document.getElementById("printerCheck").style.display = 'block';
+                    			queryPrinterName(selectedPrinter);
+                    		}else{
+                        		$('#printAlert').hide();
+                    		}
+                    	}else{
+                    		$('#printAlert').hide();
+                    		document.getElementById("firmware").style.display = 'none';
+                    		document.getElementById("printerCheck").style.display = 'none';
+                    	}
+                    	
+                    	
+                    	
+                    	} //CR21_20022024_Capturing Printer Model and provide link to update Brother printer firmware
+                    }
+                });
+            }
+			
+			// srikanth changes starts here
+		
+			function downloadPCPExeFile(){
+				downloadPCPExeFile1();
+				setTimeout(changeCaptcha, 500);
+			}
+			
+			function downloadPCPExeFile1(){
+				var captcha = document.getElementById("searchjcaptcha1").value;
+				//CR09_31052018_DLSP_AdditionalChanges - Start
+				var params = [];
+		        params["rDoAction"] = "downloadPCPExeFile";
+		        params["captcha"] = captcha;
+		        params["from"] = "";
+
+		        var URL = '/eStampIndia/submission/SubmissionServlet';
+		        document.getElementById("searchjcaptcha1").value='';
+		         // Calling the openPost method
+		        openPost(URL,params);
+		        //CR09_31052018_DLSP_AdditionalChanges - End
+			}
+			
+			function changeCaptcha(){
+				reloadImg('cap'); 
+				$("#captchmessage").html(" ");
+			}
+			//CR09_31052018_DLSP_AdditionalChanges - Start
+			function openPost(url, variables){
+		        var form = document.createElement("form");
+		        form.setAttribute("method", "post");
+		        form.setAttribute("action", url);
+		        for(variable in variables)
+		        {
+		            var hiddenField = document.createElement("input");
+		            hiddenField.setAttribute("type", "hidden");
+		            hiddenField.setAttribute("name", variable);
+		            hiddenField.setAttribute("value", variables[variable]);
+		            form.appendChild(hiddenField);
+		        }
+		        document.body.appendChild(form);
+		        form.submit();
+		    }
+		    //CR09_31052018_DLSP_AdditionalChanges - End
+			
+			
+			
+			
+			
+            function begin() {
+				$('#printControlMessages').hide(); 
+				$("#firmware").hide();
+    			$('#printerCheck').hide();
+				//added by srikanth to find out the version installed in client machine from logs--starts here
+					if(showPrintButton=="Y"){
+						  $('#printOptions').show();
+					}
+				//added by srikanth to find out the version installed in client machine from logs--ends here
+				 
+                
+				$("#printerListContainer").html("<img src=\"/trade/esi/images/loading.gif\" height=\"40\" width=\"40\" style=\"position: relative; top: -12px\" /><span style=\"position: relative; top: -27px\"> &nbsp;Loading Printer List</span>");
+
+                queryPrinters(false);
+                //CR21_20022024_Capturing Printer Model and provide link to update Brother printer firmware
+                $("#printerListContainer").change(function () {
+                	var selectedPrinter = $('#printerListContainer :selected').text();
+                	var pfirmWareCheck = "";
+                	if(null!=pfirmWareCheck && "Y"==pfirmWareCheck){
+                		if (null!=currentInstalledPCPVersion && ("1.5.3.0"!=currentInstalledPCPVersion && "1.5.3.1"!=currentInstalledPCPVersion)){
+                			$('#printAlert').show();
+                			queryPrinterName(selectedPrinter);
+                		}else{
+                			$('#printAlert').hide();
+                			$("#firmware").hide();
+                			$('#printerCheck').hide();
+                		}
+                	}
+                });
+                //CR21_20022024_Capturing Printer Model and provide link to update Brother printer firmware
+				//Support #139124: 404 error message in eStamping access log -- start
+				/*  preload([
+                    '/trade/esi/images/progress.gif',
+                    '/trade/esi/images/Information.png',
+                    '/trade/esi/images/Error.png'
+                ]); */ 
+                //Support #139124: 404 error message in eStamping access log -- End
+                $('#printBtn').click(function () {
+					$('#progress').show();
+                    $('#printOptions :input').prop("disabled", true);
+                    setPrintType();
+                    
+                    var printerName = $('select[name="printerName"]').val();
+                    var pCopiesToPrint = 1;
+                    
+                    $("#progress").html("<span style=\"font-family :Helvetica;font-size : 12px;\">"+pFilename.replace(".ps", "") +"</span>&nbsp;" +"<img src=\"/trade/esi/images/progress.gif\" /><span style=\"font-family :Helvetica;font-size : 12px;\"> &nbsp;Preparing document. Please do not close this window, wait for the printing process to be completed.</span>");
+					//Bug 471769: Intermittent issue in capturing of stationery after printing e-stamp - Vishnu
+                    PrintService.ajaxPrint(printerName, pCopiesToPrint).done(function (printResult) {
+                        if (printResult.jobError == "") {
+                            $('#jobId').text(printResult.jobId);
+                            $('#progress').html("<span style=\"font-family :Helvetica;font-size : 12px;\">"+pFilename.replace(".ps", "") +"</span>&nbsp;" +"<img src=\"/trade/esi/images/progress.gif\" /><span style=\"font-family :Helvetica;font-size : 12px\"> &nbsp;Sending document to printer</span>");
+
+                            PrintService.ajaxMonitorPrintJob(printerName, printResult.jobId, function (printJob) {
+                                $('#jobStatus').text(printJob.jobStatus);
+                                $('#pagesPrinted').text(printJob.numberOfPagesPrinted + ' of ' + printJob.totalNumberOfPages);
+                                if (printJob.jobError == "") {
+									if (printJob.jobStatus == "Finished Printing") {
+										$('#progress').html("<img src=\"/trade/esi/images/Information.png\" height=\"24\" width=\"24\" style=\"position: relative; top: -5px\" /><span style=\"font-family :Helvetica;font-size : 12px\"> Document ready for collection at printer.</span>");
+										window.location.href = '/eStampIndia/submission/SubmissionServlet?rDoAction=PrintCompleted&ptype=PCP';
+									}
+									else if (printJob.jobStatus == "Paper Out After Printing") {
+										$('#progress').html("<img src=\"/trade/esi/images/Information.png\" height=\"24\" width=\"24\" style=\"position: relative; top: -5px\" /><span style=\"font-family :Helvetica;font-size : 12px\"> Document ready for collection at printer.</span>");
+										window.location.href = '/eStampIndia/submission/SubmissionServlet?rDoAction=PrintCompleted&ptype=PCP';
+										alert("Machine Out of Service: Out of Paper.");
+									}
+									else {
+										$('#progress').html("<span style=\"font-family :Helvetica;font-size : 12px;\">"+pFilename.replace(".ps", "") +"</span>&nbsp;" +"<img src=\"/trade/esi/images/Information.png\" height=\"24\" width=\"24\" style=\"position: relative; top: -5px\" /><span style=\"font-family :Helvetica;font-size : 12px\"> Document sent to printer!</span>");
+										window.location.href = '/eStampIndia/submission/SubmissionServlet?rDoAction=PrintCompleted&ptype=PCP';
+									}
+									
+                                }
+                                else {
+                                    alert("Attention!\n\n" + printJob.jobError);
+									$('#progress').html("<img src=\"/trade/esi/images/Information.png\" height=\"24\" width=\"24\" style=\"position: relative; top: -5px\" /><span style=\"font-family :Helvetica;font-size : 12px\"> " + printJob.jobError + "</span>");
+									window.location.href = '/eStampIndia/submission/SubmissionServlet?rDoAction=PrintCompleted&ptype=PCP';
+                                }
+                            });
+                        }
+                        else {
+                        	
+                            /*  alert("Attention!\n\n" + printResult.jobError);
+							$('#progress').html("<img src=\"/trade/esi/images/Information.png\" height=\"24\" width=\"24\" style=\"position: relative; top: -5px\" /><span style=\"font-family :Helvetica;font-size : 12px\"> " + printResult.jobError + "</span>");
+							window.location.href = '/eStampIndia/submission/SubmissionServlet?rDoAction=PrintCompleted&ptype=PCP';
+                         */
+                        	
+                        	
+                         	 if (printResult.jobError.startsWith("Failed to update print status:")) {
+								alert("Attention!\n\n" + printResult.jobError);
+		    						$('#progress').html("<img src=\"/trade/esi/images/Error.png\" height=\"24\" width=\"24\" style=\"position: relative; top: -5px\" /><span style=\"font-family :Helvetica;font-size : 12px\"> Print Status not received from PCP.</span>");
+									window.location.href = '/eStampIndia/submission/SubmissionServlet?rDoAction=PrintCompleted&ptype=PCP&pStatusFail=NOT_RECEIVED'; 
+							}
+                        	 else{
+	                            alert("Attention!\n\n" + printResult.jobError);
+								$('#progress').html("<img src=\"/trade/esi/images/Information.png\" height=\"24\" width=\"24\" style=\"position: relative; top: -5px\" /><span style=\"font-family :Helvetica;font-size : 12px\"> " + printResult.jobError + "</span>");
+								window.location.href = '/eStampIndia/submission/SubmissionServlet?rDoAction=PrintCompleted&ptype=PCP';
+
+							} 
+                        }
+                    }).fail(function (data) {
+                        // re-enable form for user to retry
+                       // $('#printOptions :input').prop("disabled", false);
+						var ajaxCheck = PrintService.ajaxGetPrintControlVersion().done(function (data1) {
+						$('#progress').html("<img src=\"/trade/esi/images/Error.png\" height=\"24\" width=\"24\" style=\"position: relative; top: -5px\" /><span style=\"font-family :Helvetica;font-size : 12px\"> An error occurred while processing your request. Application Error: " + data.status + ".</span>");
+							window.location.href = '/eStampIndia/submission/SubmissionServlet?rDoAction=PrintCompleted&ptype=PCP&pStatusFail=Y'; //Capturing_Stationery_number_BUG377209
+						}).fail(function (data) {	
+						$('#progress').html("<img src=\"/trade/esi/images/Error.png\" height=\"24\" width=\"24\" style=\"position: relative; top: -5px\" /><span style=\"font-family :Helvetica;font-size : 12px\"> An error occurred while processing your request. Please ensure that the Phidelity client is running.</span>");
+							window.location.href = '/eStampIndia/submission/SubmissionServlet?rDoAction=PrintCompleted&ptype=PCP&pStatusFail=Y'; //Capturing_Stationery_number_BUG377209
+						});
+						
+                    });
+                    
+                    // prevent navigating away
+                    return false;
+                });
+				
+            }
+            function requiresDiffPrintControlVersion(appVersion) {
+                if (appVersion == null || appVersion == "") {
+                    return true;
+                }
+
+                return pPrintControlVersion != null && appVersion != pPrintControlVersion;
+            }
+
+            function initUpdatePrintControl() {
+          $('#printControlStatus').text('Required version ' + pPrintControlVersion + ' not found.'); 
+            
+              	$('#printControlStatus').hide();
+                $('#downloadLink').show();
+                $('#downloadPrintControl').show();
+                $('#instructions').show();
+                $('#captcha1').show();
+                $('#captcha2').show();
+                $('#captcha3').show();
+                $('#captcha4').show();
+                $('#captcha5').show();
+            }
+
+            function onDownloadPrintControl() {
+                // stop the old print control
+
+                if (isAppRunning) {
+                    PrintService.ajaxStopPrintControl();
+                }
+
+                return false;
+            }
+
+            // pollForAppStatus - boolean flag indicating whether to poll for app startup or not
+            function checkPrintControlStatus() {
+				//alert("checkPrintControlStatus");
+                var ajaxCall = PrintService.ajaxGetPrintControlVersion().done(function (data) {
+                	
+                	//alert("done");
+                    // app is running
+					clearInterval(timer);
+                    isAppRunning = true;
+                    var appVersion = data.appVersion;
+                    
+                    currentInstalledPCPVersion = appVersion; 
+                  //added by srikanth to find out the version installed in client machine from logs--starts here
+                    installedVersion=data.appVersion;
+                  //added by srikanth to find out the version installed in client machine from logs--ends here
+                  
+                    //$('#printVersion').text('v' + appVersion);
+
+                    if (requiresDiffPrintControlVersion(appVersion)) {
+                        initUpdatePrintControl();
+                        return;
+                    }
+
+                    pollForAppStatus = false;
+                    $('#executeLink').hide();
+                    $('#downloadLink').hide();
+                    $('#downloadPrintControl').hide();
+                    $('#instructions').hide();
+                    $('#captcha1').hide();
+                    $('#captcha2').hide();
+                    $('#captcha3').hide();
+                    $('#captcha4').hide();
+                    $('#captcha5').hide();
+                    
+
+                    // check against server version
+                    var currentVersion = "1.5.4.9";
+                    
+                    if(currentVersion!=null){
+                    	$('#printVersion').text('v' + appVersion);
+                    }
+                    if (appVersion != currentVersion) {
+                    	 
+                    	var forceUpdate = "Y";
+                    	if(forceUpdate=="N"){
+						$('#upgradeLink').html('<font size=3><font color="Red"><b>(click </font><a onclick="downloadPCPExeFile();" style="cursor: pointer;" ><font color="blue"><b><font color="Blue">here</b></font></a> </font><font color="Red">to update to latest version)</font></b>');
+                        $('#upgradeLink').show();
+                        $('#instructions').show();
+                        $('#printOptions').show();
+                        $('#captcha1').show();
+                        $('#captcha2').show();
+                        $('#captcha3').show();
+                        $('#captcha4').show();
+                        $('#captcha5').show();
+                        showPrintButton="Y";
+                    	}else{
+                    		$('#upgradeLink').html('<font size=3><font color="Red"><b>(click </font><a onclick="downloadPCPExeFile();" style="cursor: pointer;" ><font color="blue"><b>here</b></font></a> <font color="Red"> to update to latest version<font color="Red"><b>(Mandatory Update)</b></font>).</br>Please uninstall older version and then,&nbsp;install new version. Close print window and initiate print again.</b>');
+                            $('#upgradeLink').show();
+                            $('#instructions').show();
+                            $('#printOptions').hide();
+                            $('#captcha1').show();
+                            $('#captcha2').show();
+                            $('#captcha3').show();
+                            $('#captcha4').show();
+                            $('#captcha5').show();
+                    	}
+                        
+                    }
+                   
+                    if (appVersion == currentVersion) {
+                    	 showPrintButton="Y";
+                    }
+                    // setup the event handlers after the initializations
+                    PrintService.onAjaxStart(PrintServiceUtil.onAjaxStart);
+                    PrintService.onAjaxStop(PrintServiceUtil.onAjaxStop);
+                    PrintService.onAjaxError(PrintServiceUtil.onAjaxError);
+
+                    begin();
+                }).fail(function (data) {
+					clearInterval(timer);
+                    isAppRunning = false;
+
+                    // app is not running; check that app is installed (i.e. at least executed once)
+                    var lastRunVersion = PrintService.getLastRunVersion();
+                    //alert('lastRunVersion ' + lastRunVersion);
+                    
+                    if (lastRunVersion != null) {
+                        if (requiresDiffPrintControlVersion(lastRunVersion)) {
+                            initUpdatePrintControl();
+                            return;
+                        }
+
+                        //alert('version accepted');
+                        //$('#printVersion').text('v' + lastRunVersion);
+						$('#printControlStatus').hide();
+                        $('#downloadLink').show();
+                    } else {
+                        $('#printControlStatus').text('Print Control Not Detected/Installed');
+                        $('#downloadLink').show();
+                        $('#downloadPrintControl').show();
+                    }
+                }).always(function () {
+                    if (pollForAppStatus) {
+                        setTimeout(function () {
+                            checkPrintControlStatus()
+                        }, appStatusPollIntervalMs);
+                    }
+                });
+
+                // set timeout
+                setTimeout(function () {
+                    ajaxCall.abort();
+                }, 3000);
+            }
+
+            $(document).ready(function () {
+                  PrintService.init(printControlBaseUrl, pSessionKey, pSessionValue, pFilename, pURL,"","",pCustom,"","",pAlias,pVerifyString);  //PCP_Upgrade - Vishnu
+                 /*  PrintService.init(printControlBaseUrl, pSessionKey, pSessionValue, pFilename, pURL,"","",pCustom);  */ //Commented by Vishnu for PCP_Upgrade
+				//alert("ready");
+				if ($('.link2').hasClass('disabled'))
+                {                    	
+            		//Do nothing
+                } else {
+                	$('.link2').addClass('disabled');
+                }
+            	
+            	$("#btnClose").click(function() {
+            		
+            		var isClose = confirm("Are you sure want to close the print window.");
+            		if(isClose == true){
+            			$('.link2').removeClass('disabled');
+            			$('#messageWindowClose').show();
+            			refreshPage();
+            		}		
+            		
+            	});
+
+				// display checking message
+                var i = 0;
+                timer = setInterval(function() {
+                    i = ++i % 4;
+                    $("#printControlStatus").html("Checking Print Control" + Array(i+1).join("."));
+                }, 500);
+				
+                var currentInstalledPCPVersion = null;
+                // check if app is running
+                checkPrintControlStatus();
+                
+            });
+            
+            function refreshPage(){
+            	//Added by Vishnu for CR45_OdishaRegistration
+            	
+            	//Added bu Vishnu for CR45_OdishaRegistration
+            	var isSearchBulkCertRes = "N";
+            	var isOnlineEstampPrint=false;
+            	if(isSearchBulkCertRes == "Y"){
+            		window.location.href = '/eStampIndia/submission/BulkSubmissionServlet?rDoAction=SearchBulkCertificateResult';
+            		//<!--Added for CR27_GJ_378915 ----->
+            	}else if(isOnlineEstampPrint)
+            		{
+            		window.location.href = '/eStampIndia/onlineestampprint/OnlineEstampPrintServlet?rDoAction=getCertDetails';
+            		}
+            		//<!--Added for CR27_GJ_378915 ----->
+            	else{
+            		window.location.href = '/eStampIndia/submission/SubmissionServlet?rDoAction=ReprintCertificatePreview';
+            	}
+            }
+            
+           /*  Software Testing Case #134620 starts here */
+            function backButton() {
+            	window.location.href = '/eStampIndia/cert/certgen/CertGenServlet?sDoAction=DraftDetail&fromErrorPage=yes';        		
+        	}
+            /*  Software Testing Case #134620 ends here */ 
+            
+      function setPrintType(){	
+            	
+            
+       }
+            
+            
+            //CR21_20022024_Capturing Printer Model and provide link to update Brother printer firmware
+      function queryPrinterName(selectedPrinter){
+
+    	  	var printerFirmware;
+    	 	$("#progress").show();
+    		$("#progress").html("<img src=\"/trade/esi/images/loading.gif\" height=\"40\" width=\"40\" /><span> &nbsp;Checking printer...</span>");
+    		$('#printBtn').prop("disabled", true);
+    		
+    		PrintService.ajaxQueryPrinterName(selectedPrinter).done(function (response) {	
+    			 printerFirmware = response.printerFirmware;
+
+     			
+    			 postPrinterName(response.printerName, printerFirmware);
+ 				var pFirmwareStatus = '';
+         	 	firmwareShowHide(pFirmwareStatus);
+         		
+    		}).fail(function(date) {
+
+    		if(selectedPrinter.toLowerCase().includes("brother")){
+    			$('#printBtn').prop("disabled", false);
+    		}
+    		});
+    	}	
+     var fmware = "UNK_FW";
+   	 var pFUpdateURL = "";	
+      function postPrinterName(printerName, printerFirmware){
+
+     	 $.ajax({ type: "POST", 
+     		url: "/eStampIndia/submission/SubmissionServlet",  
+              data: { rDoAction: "savePrinterDtls", printerName : printerName, printerFirmware : printerFirmware, currentInstalledPCPVersion : currentInstalledPCPVersion} ,
+              dataType: 'json',
+              success : function(text)
+              {	
+            		fmware = text.firmware;
+            		pFUpdateURL = text.pFUpdateURL;
+                    document.getElementById('fmware').innerHTML = fmware;
+             	 if(text.response == "No FirmWare Update required"){
+             		 $("#progress").hide();
+             		$('#printBtn').prop("disabled", false);
+             		$('#printBtn').show();
+             		 return true;
+             	 }else if (text.response == "Update Printer Firmware"){
+             		 $("#progress").hide();
+             		 firmwareShowHide(text);
+             		//$('#printBtn').prop("disabled", true);
+             		 return false;
+             	 }else if (text.response == "Update Printer Firmware Force"){
+             		 $("#progress").hide();
+             		 firmwareShowHide(text);
+             		$('#printBtn').prop("disabled", true);
+             		 return false;
+             	 }else{
+             		$("#progress").hide();
+             		$('#printBtn').prop("disabled", false);
+             		$('#printBtn').show();
+             		 return true;
+             	 }             	 
+              }
+     	 });
+     } 
+
+      
+      function updateBrotherFirmware(){	
+    	  window.open(pFUpdateURL);
+  	}
+      
+      function firmwareShowHide(pFirmwareStatus) {
+    	  
+    	  var x = document.getElementById("firmware");
+    	  var pFirmWareCheck = ''; 
+    	  if ((null!=pFirmWareCheck && "Y"==pFirmWareCheck) && ("Update Printer Firmware Force"==pFirmwareStatus.response)) {
+    	    x.style.display = "inline"; 
+    	    $('#printBtn').prop("disabled", true);
+			$("#progress").hide();
+    	  }else if ((null!=pFirmWareCheck && "Y"==pFirmWareCheck) && ("Update Printer Firmware"==pFirmwareStatus.response)) {
+    	    x.style.display = "inline"; 
+    	    $('#printBtn').prop("disabled", false);
+			$("#progress").hide();
+    	  } else {
+    		  $('#printBtn').prop("disabled", false);
+    		  $("#progress").hide();
+    		  x.style.display = "none";
+    	  }
+    	} 
+      function refreshFirmWareCheck() {
+     	 var selectedPrinter = $('#printerListContainer :selected').text();
+  		 var pfirmWareCheck = "";
+  		$("#firmware").hide();
+  		 
+  		 if(null!=pfirmWareCheck && "Y"==pfirmWareCheck){
+  			if (null!=currentInstalledPCPVersion && ("1.5.3.0"!=currentInstalledPCPVersion && "1.5.3.1"!=currentInstalledPCPVersion)){
+  				queryPrinterName(selectedPrinter);
+  			}
+      }
+      }
+      //CR21_20022024_Capturing Printer Model and provide link to update Brother printer firmware
+            </script>
+
+
+
+
+	<table width="700" bgcolor="#ffffff">
+		<!-- Support #79972 - START -->
+		<tbody><tr align="left">
+			<td align="left">
+			<table border="0" cellspacing="3" cellpadding="3">
+				<tbody><tr>
+					<td class="title" align="left">E-Stamping - Print Certificate</td>
+				</tr>
+			</tbody></table>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2"><br>
+			<table border="0" cellspacing="5" cellpadding="2">
+				<tbody><tr>
+					<td>
+					<table border="0" cellpadding="0" cellspacing="0">
+						<tbody><tr dir="ltr">
+
+							<td width="10" style="background-color: #CC7A00"><img src="/trade/esi/images/pfk_spacer.gif" width="10" height="20">
+							</td>
+							<td dir="ltr" class="ttl-category" height="19" width="792">
+&nbsp;
+										<span class="ttl-predefined"> Print Generated Stamp Certificate </span>
+							</td>
+
+						</tr>
+
+					</tbody></table>
+					</td>
+				</tr>
+			</tbody></table>
+			<br>
+			</td>
+		</tr>
+		<!-- Support #79972 - END -->
+ 		<tr>
+			<td align="center">
+				<table width="400" height="280" style="border-collapse: collapse;" border="1">
+	
+				<tbody><tr>
+					<td align="center" valign="top">
+						<div id="closeDiv" align="right" style="background-color : #e7e7e7;"><input type="button" value="Close" id="btnClose"></div>
+						<br>
+
+					 <table class="printControl">
+							<thead>
+							
+							<tr>					  
+						<td colspan="4"><span id="captcha4" class="nowrap" style="display: none;"> <font size="1" style="color:black;"><p><b>Please Enter Captcha(Case Sensitive) and click download link below to download Print Control Program</b></p></font></span></td>
+					</tr>
+						<tr><td><br></td></tr>	
+						<tr>
+						<td align="right" width="50%"><span id="captcha1" style="display: none;"><font size="2" style="color:black;">Captcha :</font></span></td>
+		
+						<td aligh="left" width="50%"><span id="captcha2" style="display: none;"><input type="text" id="searchjcaptcha1" maxlength="7" size="6" name="searchjcaptcha" onkeypress="enterSubmit(event)"></span>	
+						</td>
+					   </tr>
+					   
+				
+					<tr>
+						<td align="center" colspan=""></td>
+										<td height="36" width="10%">
+											<div>
+										<span id="captcha3" style="display: none;">		<img id="cap" src="/eStampIndia/esi/captcha.png" border="1" height="30" width="112"> <img style="cursor: hand; cursor: pointer; " src="/trade/esi/images/change.png" onclick="return reloadImg('cap');"></span>
+											</div>
+										</td>
+										
+					</tr>
+					
+					
+					<tr>					    
+						<td id="captchmessage" colspan="4"><font size="1" style="color:red;"><span id="captcha5" class="nowrap" style="display: none;"><b></b></span></font></td>
+					</tr>
+					
+					
+								<tr>
+									<td colspan="2">										
+										<span id="printVersion" class="printControlVersion" style="font-family :Helvetica;font-size : 20px;">v1.5.4.9</span>
+									<span id="upgradeLink" class="printControlVersion"></span>
+									</td>
+								</tr>
+								
+								<!-- <tr>
+									<td colspan="2">
+										<img src="/trade/esi/images/Printer.png" height="40" width="40" />
+										<span style="position: relative; top: -17px; font-size: 10pt">PHIDÉLITY PRINT CONTROL</span>
+									</td>
+								</tr> -->
+                             
+							</thead>
+							
+							
+						 	<tbody><tr id="printControlMessages" style="display: none;">
+								<td colspan="2">
+								<span id="downloadLink" style="font-family: Helvetica; font-size: 12px; display: none;">If Print Control Program is not installed, click<a onclick="downloadPCPExeFile();" style="cursor: pointer;"> <font color="blue"><b>here</b></font></a> to download  <br> Print Control Program<br><br><b style="color:red">Print Control Program is not running</b><br><br>If Print Control Program is already installed, double click on Print Control<br> Program in start menu to run Print Control Program.<br><br></span></td>
+							</tr>
+							<!-- CR21_20022024_Capturing Printer Model and provide link to update Brother printer firmware -->
+								<tr><td colspan="2">
+								<div id="firmware" style="font-family: Helvetica; font-size: 12px; display: none;"><p> <strong> Your printer firmware version is: </strong><b id="fmware" value="fmware" style="color:#FF0000;"></b> </p><div id="resultContainer"></div><p><strong> which is out dated. To continue e-Stamp printing, please update the Printer firmware.</strong><a onclick="updateBrotherFirmware();" style="cursor: pointer;"> <font color="blue"><b> Click here </b></font></a> <b> to download firmware from Printer vendor web site. After Firmware update, please print some sample document and come back to e-Stamp printing.
+								</b></p> <br><b style="color:red"></b><br> </div>
+								</td>
+							<!-- CR21_20022024_Capturing Printer Model and provide link to update Brother printer firmware -->
+							</tr></tbody><tbody id="printOptions" style="">
+							
+												<tr>
+						<td align="center" colspan=""></td>
+										<td height="36" width="10%">
+											<div>
+										
+									<p id="printerCheck" border="1" height="20" width="100" style="font-family: Helvetica; font-size: 12px; display: none;"><b> Click on the Printer icon to do Firmware check  </b>	<img width="30" height="30" style="cursor: hand; cursor: pointer; " src="/trade/esi/images/Printer.png" onclick="refreshFirmWareCheck();">
+										</p>
+											</div>
+										</td>
+										
+					</tr>
+							
+								<tr>
+									<td width="120px">Printer:</td>
+									<td width="275px"><span id="printerListContainer" class="printControlVersion"><select name="printerName"><option value="HP LaserJet M403d UPD PS">HP LaserJet M403d UPD PS</option></select></span></td>
+									<td><button type="button" id="refreshBtn" onclick="javascript: queryPrinters(true); return false;" style="position: relative; top: -2px;"> Refresh</button></td>
+								</tr>
+								<tr>
+								<td><input type="hidden" name="pFileName" value="IN-UP60058937510453Y.ps"></td>
+									<td>&nbsp;</td>
+									<td><button type="button" id="printBtn" style="display: Helvetica">Print</button></td>
+								
+										 
+									 <td id="printJob"></td>
+								</tr>	
+						
+								<tr><td>&nbsp;</td></tr>
+
+								<tr>
+									<td>&nbsp;</td>
+									<td id="progress" colspan="2" style="display: none" align="middle"></td>
+								</tr>
+								<!-- Issue 73402:e-stamp printing was out of proportion -->
+								<tr>					  
+						<td colspan="4"><span id="captcha4" class="nowrap"> <font size="1" style="color:red;"><p><b>Please use A4 size paper for printing.<br>Please do not close or refresh the browser and do not click on back button of the browser</b></p></font></span></td>
+					</tr>
+					<!-- Issue 73402:e-stamp printing was out of proportion -->
+							</tbody>
+							<tfoot>
+							</tfoot>
+						</table>
+		
+					</td>
+				</tr>
+	
+				</tbody></table>
+			</td><!-- Support #79972 - added table inside TD -->
+		</tr>
+		<tr><td id="printAlert" style="display: none;">
+		
+	</td>
+		</tr><tr>
+			<td><div><span id="instructions" style="font-family: Helvetica; font-size: 16px; display: none;"><br>
+<b style="color:red">Instructions to download and Install new print control program</b>
+<br><br>&nbsp;&nbsp;<b>1.</b>&nbsp;Make sure that your printer is connected to PC through USB, LPT, COM, DOT4 or valid<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TCP/IP ports.<br>
+&nbsp;&nbsp;<b>2.</b>&nbsp;Click on the download link to download Print control program. A Zip file will be downloaded to<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; your desktop.<br> 
+&nbsp;&nbsp;<b>3.</b>&nbsp;Go to the folder where Zip file was downloaded and unzip the downloaded zip file. The Zip file<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; will have two files - 1. PrintControlProxy.exe and 2. Readme.txt.<br> 
+&nbsp;&nbsp;<b>4.</b>&nbsp;Follow the steps given in "Readme.txt" file to install and run  print control program.  Based on<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the browser, you may need to perform additional steps as mentioned in readme.txt.<br>
+&nbsp;&nbsp;<b>5.</b>&nbsp;As mentioned in readme.txt, once print control program is installed and browser specific steps<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; are performed, Enter the URL in browser <b>https://127.0.0.1:50000/</b>, accept if there is any<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; security exception, then check whether you are seeing the response as 'PCP is running'.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; After completion of setup, this web page will display print button for you to proceed to print.<br>
+&nbsp;&nbsp;<b>6.</b>&nbsp;If PCP is running, Enter the URL <b>https://127.0.0.1:50000/testprint</b> in new browser<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; window/tab and try to print test page. Contact SHCIL for any issues or support.<br> 
+</span></div></td>
+				</tr>
+
+	</tbody></table>
+
+
+
+			
+						
+<!-- </body>
+</html> --><!-- Support #79972 - Commented and added below -->
+<!-- CR21_20022024_Capturing Printer Model and provide link to update Brother printer firmware -->
+		
+
+								
+            				</td>
+            			</tr>
+            			<tr>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td height="20" align="center" valign="top" background="/trade/esi/images/bg_footerdos.jpg">&nbsp;</td>
+						</tr>
+					</tbody></table>
+				</td>
+			</tr>
+			<tr></tr>
+		</tbody></table>
+	
+
+</body></html>
